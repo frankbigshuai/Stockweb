@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investing - Stock Information Analysis Platform</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 30px;
+            background: #e8f5e8;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #d4edda;
+        }
+        
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+            color: #28a745;
+        }
+        
+        .logo h2 {
+            margin: 0;
+            color: #2c5530;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links li {
+            position: relative;
+        }
+        
+        .nav-links a {
+            color: #495057;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-links a:hover {
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            min-width: 280px;
+            justify-content: flex-end;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            white-space: nowrap;
+        }
+        
+        .user-info span {
+            color: #495057;
+            font-weight: 500;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .user-info a, .user-info button {
+            text-decoration: none;
+            color: #495057;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .user-info a:hover, .user-info button:hover {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            min-width: 80px;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        
+        .btn-outline:hover {
+            background: #dc3545;
+            color: white;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+            
+            .navbar-left {
+                gap: 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .navbar-right {
+                min-width: 100px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin: 60px 0 40px 0;
+        }
+        
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            color: #666;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 250px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Add background images for each card */
+        .card:nth-child(1) {
+            background-image: url('/images/image1.jpeg');
+        }
+        
+        .card:nth-child(2) {
+            background-image: url('/images/image2.png');
+        }
+        
+        .card:nth-child(3) {
+            background-image: url('/images/image3.jpg');
+        }
+
+        /* Add overlay to ensure text readability */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        /* Ensure card content is above the overlay */
+        .card-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        
+        .card p {
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+        
+        .card button {
+            background: rgba(0, 123, 255, 0.9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card button:hover {
+            background: rgba(0, 86, 179, 0.9);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-left">
+                <div class="logo">
+                    <span class="logo-icon">📈</span>
+                    <a href="/" style="text-decoration: none; color: inherit;">
+                        <h2>Investing</h2>
+                    </a>
+                </div>
+                
+                <ul class="nav-links">
+                    <li><a href="/stocks.html">Top Companies</a></li>
+                    <li><a href="/compare.html">Comparison Board</a></li>
+                    <li><a href="/api/v1/forum/forum.html">Forum</a></li>
+                </ul>
+            </div>
+            
+            <div class="navbar-right">
+                <div class="auth-buttons" id="authButtons">
+                    <a href="/api/v1/auth/login" class="btn btn-primary">LOGIN</a>
+                </div>
+                
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span id="welcomeText">Welcome, username</span>
+                    <a href="/api/v1/users/profile.html">Profile</a>
+                    <button onclick="authManager.logout()" class="btn btn-outline">Log Out</button>
+                </div>
+            </div>
+        </nav>
+
+        <header>
+            <h1>Investing</h1>
+            <p>Explore the dynamic world of finance and investment</p>
+        </header>
+
+        <main class="home-content">
+            <div class="feature-cards">
+                <div class="card">
+                    <div class="card-content">
+                        <h2>Top Market Titans</h2>
+                        <p>Dive deep into a list of top-performing companies.</p>
+                        <button onclick="goToTopCompanies()">Explore</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <h2>Compare Companies</h2>
+                        <p>Analyze key financial metrics of different companies.</p>
+                        <button onclick="goToCompare()">Compare</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <h2>Join the Forum</h2>
+                        <p>Discuss the latest trends and insights with investors.</p>
+                        <button onclick="goToForum()">Visit Forum</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chatbox -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <div class="chatbox-header">
+            <h3>💬 Investment Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbox()">×</button>
+        </div>
+        
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="chatbox-message bot">
+                <div class="message-bubble">
+                    Hi! I'm your investment assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbox-input">
+            <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-toggle" onclick="toggleChatbox()" id="chatToggle">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
+        </svg>
+    </button>
+
+    <script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Details - Stock Web</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .stock-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .stock-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stock-header h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .stock-header .company-name {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .stock-header .price-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .price-change {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .positive {
+            color: #28a745;
+        }
+
+        .negative {
+            color: #dc3545;
+        }
+
+        .favorite-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-left: 20px;
+        }
+
+        .favorite-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .favorite-btn.favorited {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .favorite-btn.favorited:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ea080 100%);
+        }
+
+        .favorite-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin: 0 0 20px 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .description {
+            line-height: 1.8;
+            color: #555;
+            text-align: justify;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 50px 20px;
+            color: #dc3545;
+            background: #f8d7da;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .sector-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.1rem;
+            border: 2px dashed #ddd;
+        }
+
+        /* News Styles */
+        .news-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .news-item {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .news-item:hover {
+            background: #f8f9ff;
+            padding: 20px 15px;
+            border-radius: 10px;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .news-title:hover {
+            color: #667eea;
+        }
+
+        .news-summary {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #999;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .news-source {
+            font-weight: 500;
+        }
+
+        .news-time {
+            color: #666;
+        }
+
+        .sentiment-label {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .sentiment-bullish {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .sentiment-bearish {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .sentiment-neutral {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .no-news {
+            text-align: center;
+            color: #666;
+            padding: 40px 0;
+        }
+
+        .news-loading {
+            text-align: center;
+            color: #666;
+            padding: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .stock-detail-container {
+                padding: 10px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stock-header {
+                padding: 20px;
+            }
+
+            .stock-header h1 {
+                font-size: 2rem;
+            }
+
+            .current-price {
+                font-size: 2rem;
+            }
+
+            .price-change {
+                font-size: 1.2rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .news-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .favorite-btn {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stock-detail-container">
+        <!-- Back Button -->
+        <div class="back-button">
+            <a href="/stocks.html" class="btn btn-secondary">← Back to Stock List</a>
+        </div>
+
+        <!-- Stock Header Information -->
+        <div class="stock-header" id="stockHeader">
+            <div class="loading">Loading stock information...</div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content-grid" id="contentGrid" style="display: none;">
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Company Description -->
+                <div class="card">
+                    <h2>📄 Company Overview</h2>
+                    <div class="description" id="companyDescription">
+                        Loading...
+                    </div>
+                </div>
+
+                <!-- Price Chart -->
+                <div class="card">
+                    <h2>📈 Price Trend</h2>
+                    <div class="chart-placeholder">
+                        📊 Chart feature coming soon
+                    </div>
+                </div>
+
+                <!-- Detailed Financial Metrics -->
+                <div class="card">
+                    <h2>📊 Financial Metrics</h2>
+                    <div class="metrics-grid" id="financialMetrics">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Quick Statistics -->
+                <div class="card">
+                    <h2>⚡ Quick Stats</h2>
+                    <div class="quick-stats" id="quickStats">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="card">
+                    <h2>🏢 Basic Info</h2>
+                    <div id="basicInfo">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Section - Independent full-width area -->
+        <div class="news-section" id="newsSection" style="display: none;">
+            <h2>📰 Related News</h2>
+            <div id="newsContainer">
+                <div class="news-loading">Loading news...</div>
+            </div>
+        </div>
+    </div>
+    <!-- Chatbox -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <div class="chatbox-header">
+            <h3>💬 Investment Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbox()">×</button>
+        </div>
+        
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="chatbox-message bot">
+                <div class="message-bubble">
+                    Hi! I'm your investment assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbox-input">
+            <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-toggle" onclick="toggleChatbox()" id="chatToggle">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
+        </svg>
+    </button>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        class StockDetailManager {
+            constructor() {
+                this.symbol = null;
+                this.stockData = null;
+                this.init();
+            }
+
+            init() {
+                this.symbol = this.getSymbolFromUrl();
+                if (!this.symbol) {
+                    this.showError('Invalid stock symbol');
+                    return;
+                }
+
+                this.loadStockDetail();
+            }
+
+            getSymbolFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('symbol');
+            }
+
+            async loadStockDetail() {
+                try {
+                    console.log(`Loading stock details: ${this.symbol}`);
+                    
+                    const response = await fetch(`/api/v1/stocks/detail/${this.symbol}`);
+                    console.log('API response status:', response.status);
+                    
+                    const result = await response.json();
+                    console.log('API return result:', result);
+                    
+                    if (result.success && result.data) {
+                        this.stockData = result.data;
+                        console.log('Set stock data:', this.stockData);
+                        this.renderStockDetail();
+                        // Load news
+                        this.loadStockNews();
+                    } else {
+                        console.error('API returned failure:', result);
+                        this.showError(result.error || 'Failed to load stock details');
+                    }
+                } catch (error) {
+                    console.error('Failed to load stock details:', error);
+                    this.showError('Network error, please try again later');
+                }
+            }
+
+            async loadStockNews() {
+                try {
+                    console.log(`Loading news: ${this.symbol}`);
+                    
+                    // Show news section
+                    document.getElementById('newsSection').style.display = 'block';
+                    
+                    const response = await fetch(`/api/v1/stocks/news/${this.symbol}`);
+                    const result = await response.json();
+                    
+                    if (result.success && result.data && result.data.feed) {
+                        this.renderNews(result.data.feed);
+                    } else {
+                        this.showNoNews();
+                    }
+                    
+                } catch (error) {
+                    console.error('Failed to load news:', error);
+                    this.showNewsError();
+                }
+            }
+
+            renderNews(newsData) {
+                const container = document.getElementById('newsContainer');
+                
+                if (!newsData || newsData.length === 0) {
+                    this.showNoNews();
+                    return;
+                }
+                
+                container.innerHTML = newsData.slice(0, 10).map(article => `
+                    <div class="news-item">
+                        <a href="${article.url}" target="_blank" class="news-title">
+                            ${article.title}
+                        </a>
+                        <div class="news-summary">
+                            ${article.summary}
+                        </div>
+                        <div class="news-meta">
+                            <div>
+                                <span class="news-source">${article.source}</span>
+                                <span class="news-time">${this.formatNewsTime(article.time_published)}</span>
+                            </div>
+                            <span class="sentiment-label sentiment-${article.overall_sentiment_label.toLowerCase()}">
+                                ${article.overall_sentiment_label}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showNoNews() {
+                document.getElementById('newsContainer').innerHTML = `
+                    <div class="no-news">
+                        <p>📰 No related news available</p>
+                    </div>
+                `;
+            }
+
+            showNewsError() {
+                document.getElementById('newsContainer').innerHTML = `
+                    <div class="no-news">
+                        <p>❌ Failed to load news, please try again later</p>
+                    </div>
+                `;
+            }
+
+            formatNewsTime(timeString) {
+                try {
+                    if (!timeString || timeString.length < 8) {
+                        return timeString;
+                    }
+                    
+                    const year = timeString.substr(0, 4);
+                    const month = timeString.substr(4, 2);
+                    const day = timeString.substr(6, 2);
+                    
+                    let hour = '00', minute = '00';
+                    if (timeString.length >= 15) {
+                        hour = timeString.substr(9, 2);
+                        minute = timeString.substr(11, 2);
+                    }
+                    
+                    const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:00`);
+                    
+                    if (isNaN(date.getTime())) {
+                        return timeString;
+                    }
+                    
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffHours / 24);
+                    
+                    if (diffDays > 7) {
+                        return date.toLocaleDateString();
+                    } else if (diffDays > 0) {
+                        return `${diffDays} days ago`;
+                    } else if (diffHours > 0) {
+                        return `${diffHours} hours ago`;
+                    } else {
+                        return 'Just now';
+                    }
+                } catch (error) {
+                    console.error('Time formatting failed:', error);
+                    return timeString;
+                }
+            }
+
+            renderStockDetail() {
+                console.log('Starting to render stock details');
+                console.log('Stock data:', this.stockData);
+                
+                this.renderHeader();
+                this.renderMainContent();
+                
+                // Show content grid
+                document.getElementById('contentGrid').style.display = 'grid';
+                
+                console.log('Stock details rendering completed');
+            }
+
+            renderHeader() {
+                const data = this.stockData;
+                const changePercent = parseFloat(data.change_percent || 0);
+                const changeColor = changePercent >= 0 ? 'positive' : 'negative';
+                const changeSign = changePercent >= 0 ? '+' : '';
+
+                document.getElementById('stockHeader').innerHTML = `
+                    <h1>${data.symbol}</h1>
+                    <div class="company-name">${data.company_name || data.symbol}</div>
+                    ${data.sector ? `<span class="sector-badge">${data.sector}</span>` : ''}
+                    <div class="price-info">
+                        <div class="current-price">$${parseFloat(data.price || 0).toFixed(2)}</div>
+                        <div class="price-change ${changeColor}">
+                            ${changeSign}$${Math.abs(parseFloat(data.change || 0)).toFixed(2)}
+                            (${changeSign}${Math.abs(changePercent).toFixed(2)}%)
+                        </div>
+                        <button id="favoriteBtn" class="favorite-btn" onclick="stockDetailManager.toggleFavorite()">
+                            <span id="favoriteBtnText">Checking favorite status...</span>
+                        </button>
+                    </div>
+                `;
+                
+                // Check favorite status
+                this.checkFavoriteStatus();
+            }
+
+            renderMainContent() {
+                const data = this.stockData;
+                
+                console.log('renderMainContent called');
+                console.log('Complete stock data:', data);
+                console.log('Description field value:', data.description);
+
+                // Improved description handling logic
+                let description;
+                if (!data.description || 
+                    data.description === 'None' || 
+                    data.description === 'null' || 
+                    data.description === '' ||
+                    data.description === 'N/A') {
+                    description = `
+                        <div style="text-align: center; padding: 20px; color: #666;">
+                            <p>📋 No company overview available for ${data.symbol || 'this stock'}</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">
+                                Company Name: ${data.company_name || data.symbol || 'N/A'}
+                                <br>Industry: ${data.industry || 'N/A'}
+                                <br>Sector: ${data.sector || 'N/A'}
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    description = data.description;
+                }
+                
+                const descElement = document.getElementById('companyDescription');
+                if (descElement) {
+                    descElement.innerHTML = description;
+                    console.log('Description set successfully');
+                }
+
+                // Financial metrics
+                const financialMetrics = [
+                    { label: 'P/E Ratio', value: this.formatValue(data.pe_ratio) },
+                    { label: 'Market Cap', value: this.formatMarketCap(data.market_cap) },
+                    { label: 'Dividend Yield', value: this.formatPercentage(data.dividend_yield) },
+                    { label: 'Beta', value: this.formatValue(data.beta) },
+                    { label: 'EPS', value: this.formatValue(data.eps) },
+                    { label: 'Profit Margin', value: this.formatPercentage(data.profit_margin) },
+                    { label: '52-Week High', value: this.formatPrice(data['52_week_high']) },
+                    { label: '52-Week Low', value: this.formatPrice(data['52_week_low']) }
+                ];
+
+                document.getElementById('financialMetrics').innerHTML = financialMetrics.map(metric => `
+                    <div class="metric-item">
+                        <span class="metric-label">${metric.label}</span>
+                        <span class="metric-value">${metric.value}</span>
+                    </div>
+                `).join('');
+
+                // Quick statistics
+                document.getElementById('quickStats').innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-value">${this.formatLargeNumber(data.volume)}</div>
+                        <div class="stat-label">Volume</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${this.formatPrice(data.previous_close)}</div>
+                        <div class="stat-label">Prev Close</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${this.formatPrice(data.open)}</div>
+                        <div class="stat-label">Open</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${this.formatPrice(data.high)} / ${this.formatPrice(data.low)}</div>
+                        <div class="stat-label">High/Low</div>
+                    </div>
+                `;
+
+                // Basic information
+                document.getElementById('basicInfo').innerHTML = `
+                    <div class="metric-item">
+                        <span class="metric-label">Industry</span>
+                        <span class="metric-value">${data.industry || 'N/A'}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Sector</span>
+                        <span class="metric-value">${data.sector || 'N/A'}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Analyst Target</span>
+                        <span class="metric-value">${this.formatPrice(data.analysts_target_price)}</span>
+                    </div>
+                `;
+            }
+
+            // Favorite stock related methods
+            async checkFavoriteStatus() {
+                try {
+                    if (!authManager.isLoggedIn()) {
+                        this.updateFavoriteButton(false, false);
+                        return;
+                    }
+                    
+                    const response = await this.makeAuthenticatedRequest(`/api/v1/users/favorites/${this.symbol}/check`);
+                    if (!response) return;
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.updateFavoriteButton(true, result.is_favorite);
+                    } else {
+                        this.updateFavoriteButton(false, false);
+                    }
+                } catch (error) {
+                    console.error('Failed to check favorite status:', error);
+                    this.updateFavoriteButton(false, false);
+                }
+            }
+
+            updateFavoriteButton(canToggle, isFavorite) {
+                const btn = document.getElementById('favoriteBtn');
+                const btnText = document.getElementById('favoriteBtnText');
+                
+                if (!btn || !btnText) return;
+                
+                if (!canToggle) {
+                    btnText.textContent = 'Login to add to favorites';
+                    btn.classList.remove('favorited');
+                    btn.disabled = true;
+                    return;
+                }
+                
+                btn.disabled = false;
+                if (isFavorite) {
+                    btnText.textContent = '⭐ Favorited';
+                    btn.classList.add('favorited');
+                } else {
+                    btnText.textContent = '☆ Add to Favorites';
+                    btn.classList.remove('favorited');
+                }
+            }
+
+            async toggleFavorite() {
+                try {
+                    if (!authManager.isLoggedIn()) {
+                        alert('Please login first');
+                        window.location.href = '/api/v1/auth/login';
+                        return;
+                    }
+                    
+                    const isFavorite = document.getElementById('favoriteBtn').classList.contains('favorited');
+                    const method = isFavorite ? 'DELETE' : 'POST';
+                    
+                    const response = await this.makeAuthenticatedRequest(`/api/v1/users/favorites/${this.symbol}`, {
+                        method: method
+                    });
+                    
+                    if (!response) return;
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.updateFavoriteButton(true, !isFavorite);
+                        this.showMessage(result.message, 'success');
+                    } else {
+                        this.showMessage(result.error || 'Operation failed', 'error');
+                    }
+                    
+                } catch (error) {
+                    console.error('Failed to toggle favorite status:', error);
+                    this.showMessage('Operation failed, please try again later', 'error');
+                }
+            }
+
+            async makeAuthenticatedRequest(url, options = {}) {
+                if (!authManager.isLoggedIn()) {
+                    alert('Please login first');
+                    window.location.href = '/api/v1/auth/login';
+                    return null;
+                }
+
+                const headers = {
+                    ...authManager.getAuthHeaders(),
+                    ...options.headers
+                };
+                
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        headers
+                    });
+
+                    if (response.status === 401) {
+                        console.log('Token expired, clearing login information');
+                        authManager.clearAuthInfo();
+                        alert('Login expired, please login again');
+                        window.location.href = '/api/v1/auth/login';
+                        return null;
+                    }
+
+                    return response;
+                } catch (error) {
+                    console.error('Request failed:', error);
+                    throw error;
+                }
+            }
+
+            showMessage(message, type) {
+                // Create temporary message notification
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = message;
+                messageDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    color: white;
+                    font-weight: 600;
+                    z-index: 1000;
+                    background: ${type === 'success' ? '#28a745' : '#dc3545'};
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                `;
+                
+                document.body.appendChild(messageDiv);
+                
+                // Show animation
+                setTimeout(() => {
+                    messageDiv.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    messageDiv.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            messageDiv.parentNode.removeChild(messageDiv);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+
+            // Formatting methods
+            formatValue(value) {
+                if (!value || value === 'N/A' || value === 'None') return 'N/A';
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'N/A';
+                return num.toFixed(2);
+            }
+
+            formatPrice(value) {
+                if (!value || value === 'N/A' || value === 'None') return 'N/A';
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'N/A';
+                return `${num.toFixed(2)}`;
+            }
+
+            formatPercentage(value) {
+                if (!value || value === 'N/A' || value === 'None') return 'N/A';
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'N/A';
+                return `${(num * 100).toFixed(2)}%`;
+            }
+
+            formatMarketCap(value) {
+                if (!value || value === 'N/A' || value === 'None') return 'N/A';
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'N/A';
+                
+                if (num >= 1e12) {
+                    return `${(num / 1e12).toFixed(2)}T`;
+                } else if (num >= 1e9) {
+                    return `${(num / 1e9).toFixed(2)}B`;
+                } else if (num >= 1e6) {
+                    return `${(num / 1e6).toFixed(2)}M`;
+                } else {
+                    return `${num.toFixed(0)}`;
+                }
+            }
+
+            formatLargeNumber(value) {
+                if (!value || value === 'N/A' || value === 'None') return 'N/A';
+                const num = parseFloat(value);
+                if (isNaN(num)) return 'N/A';
+                
+                if (num >= 1e9) {
+                    return `${(num / 1e9).toFixed(2)}B`;
+                } else if (num >= 1e6) {
+                    return `${(num / 1e6).toFixed(2)}M`;
+                } else if (num >= 1e3) {
+                    return `${(num / 1e3).toFixed(1)}K`;
+                } else {
+                    return num.toFixed(0);
+                }
+            }
+
+            showError(message) {
+                document.getElementById('stockHeader').innerHTML = `
+                    <div class="error-message">❌ ${message}</div>
+                `;
+            }
+        }
+
+        // Initialize stock detail manager
+        let stockDetailManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            stockDetailManager = new StockDetailManager();
+        });
+    </script>
+</body>
+</html>

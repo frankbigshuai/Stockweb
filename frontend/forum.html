@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Forum - Investing</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Navigation Bar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            background: #e8f5e8;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #d4edda;
+        }
+        
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .logo-icon {
+            font-size: 18px;
+            color: #28a745;
+        }
+        
+        .logo h2 {
+            margin: 0;
+            color: #2c5530;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links li {
+            position: relative;
+        }
+        
+        .nav-links a {
+            color: #495057;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .nav-links a:hover {
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .nav-links a.active {
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.15);
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            min-width: 200px;
+            justify-content: flex-end;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+        
+        .user-info span {
+            color: #495057;
+            font-weight: 500;
+            font-size: 12px;
+            min-width: 80px;
+        }
+        
+        .user-info a, .user-info button {
+            text-decoration: none;
+            color: #495057;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .user-info a:hover, .user-info button:hover {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            min-width: 60px;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        
+        .btn-outline:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Back Button Styles */
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* My Posts Button Styles */
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+            font-size: 12px;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
+        .forum-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .forum-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .forum-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .category-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sort-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sort-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .create-post-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .create-post-btn:hover {
+            background: #218838;
+        }
+
+        /* User Actions Container */
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .posts-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .post-item {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .post-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .post-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0 0 5px 0;
+            line-height: 1.4;
+        }
+
+        .post-title:hover {
+            color: #667eea;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .post-content {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .post-category {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .post-tags {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .post-tag {
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:hover {
+            background: #f0f0f0;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .pinned-post {
+            background: #fff3cd !important;
+            border-left: 4px solid #ffc107;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 8px 15px;
+            }
+            
+            .navbar-left {
+                gap: 15px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .navbar-right {
+                min-width: 80px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 11px;
+                min-width: 50px;
+            }
+
+            .forum-nav {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .category-filters {
+                justify-content: center;
+            }
+            
+            .post-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .post-meta {
+                flex-wrap: wrap;
+            }
+
+            .user-actions {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .user-actions .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="logo">
+                <span class="logo-icon">📈</span>
+                <a href="/" style="text-decoration: none; color: inherit;">
+                    <h2>Investing</h2>
+                </a>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="/stocks.html">Top Companies</a></li>
+                <li><a href="/compare.html">Comparison Board</a></li>
+                <li><a href="/api/v1/forum/forum.html" class="active">Forum</a></li>
+            </ul>
+        </div>
+        
+        <div class="navbar-right">
+            <div class="auth-buttons" id="authButtons">
+                <a href="/api/v1/auth/login" class="btn btn-primary">LOGIN</a>
+            </div>
+            
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span id="welcomeText">Welcome, username</span>
+                <a href="/api/v1/users/profile.html">Profile</a>
+                <button onclick="authManager.logout()" class="btn btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="forum-container">
+        <!-- Back to Home Button -->
+        <div class="back-button">
+            <a href="/" class="btn btn-secondary">← Back to Home</a>
+        </div>
+
+        <!-- Forum Header -->
+        <div class="forum-header">
+            <h1>📈 Investment Forum</h1>
+            <p>Share investment insights, discuss market trends, and grow together</p>
+        </div>
+
+        <!-- Forum Navigation -->
+        <div class="forum-nav">
+            <div class="category-filters">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="general">General</button>
+                <button class="category-btn" data-category="stocks">Stock Analysis</button>
+                <button class="category-btn" data-category="market">Market Views</button>
+                <button class="category-btn" data-category="strategy">Investment Strategy</button>
+                <button class="category-btn" data-category="news">Financial News</button>
+                <button class="category-btn" data-category="tech">Technical Analysis</button>
+                <button class="category-btn" data-category="question">Q&A</button>
+            </div>
+
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="sort-controls">
+                    <span>Sort by:</span>
+                    <button class="sort-btn active" data-sort="latest">Latest</button>
+                    <button class="sort-btn" data-sort="popular">Popular</button>
+                    <button class="sort-btn" data-sort="most_commented">Most Discussed</button>
+                </div>
+
+                <!-- User Actions Container -->
+                <div class="user-actions">
+                    <a href="/api/v1/forum/my-posts.html" class="btn btn-info" id="myPostsBtn" style="display: none;">📝 My Posts</a>
+                    <a href="/api/v1/forum/create-post.html" class="create-post-btn" id="createPostBtn">New Post</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Posts List -->
+        <div class="posts-list" id="postsList">
+            <div class="loading">Loading posts...</div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+    </div>
+    <!-- Chatbox -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <div class="chatbox-header">
+            <h3>💬 Investment Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbox()">×</button>
+        </div>
+        
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="chatbox-message bot">
+                <div class="message-bubble">
+                    Hi! I'm your investment assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbox-input">
+            <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-toggle" onclick="toggleChatbox()" id="chatToggle">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
+        </svg>
+    </button>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        // Authentication state management
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (authManager.isLoggedIn()) {
+                const isValid = await authManager.verifyToken();
+                if (isValid) {
+                    updateUIForLoggedInUser();
+                } else {
+                    updateUIForLoggedOutUser();
+                }
+            } else {
+                updateUIForLoggedOutUser();
+            }
+            
+            // Initialize forum manager
+            forumManager = new ForumManager();
+        });
+        
+        function updateUIForLoggedInUser() {
+            const authButtons = document.getElementById('authButtons');
+            if (authButtons) {
+                authButtons.style.display = 'none';
+            }
+            
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                userInfo.style.display = 'flex';
+            }
+            
+            // 显示我的帖子按钮
+            const myPostsBtn = document.getElementById('myPostsBtn');
+            if (myPostsBtn) {
+                myPostsBtn.style.display = 'inline-block';
+            }
+            
+            if (authManager.user) {
+                const welcomeText = document.getElementById('welcomeText');
+                if (welcomeText) {
+                    welcomeText.textContent = `Welcome, ${authManager.user.username}`;
+                }
+            }
+        }
+        
+        function updateUIForLoggedOutUser() {
+            const authButtons = document.getElementById('authButtons');
+            if (authButtons) {
+                authButtons.style.display = 'flex';
+            }
+            
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                userInfo.style.display = 'none';
+            }
+            
+            // 隐藏我的帖子按钮
+            const myPostsBtn = document.getElementById('myPostsBtn');
+            if (myPostsBtn) {
+                myPostsBtn.style.display = 'none';
+            }
+        }
+
+        class ForumManager {
+            constructor() {
+                this.currentPage = 1;
+                this.currentCategory = 'all';
+                this.currentSort = 'latest';
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadPosts();
+            }
+
+            bindEvents() {
+                // Category filtering
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentCategory = e.target.dataset.category;
+                        this.currentPage = 1;
+                        this.loadPosts();
+                    });
+                });
+
+                // Sort options
+                document.querySelectorAll('.sort-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentSort = e.target.dataset.sort;
+                        this.currentPage = 1;
+                        this.loadPosts();
+                    });
+                });
+
+                // Create post button
+                document.getElementById('createPostBtn').addEventListener('click', (e) => {
+                    if (!authManager.isLoggedIn()) {
+                        e.preventDefault();
+                        alert('Please login first to create a post');
+                        window.location.href = '/api/v1/auth/login';
+                    }
+                });
+
+                // My posts button
+                document.getElementById('myPostsBtn').addEventListener('click', (e) => {
+                    if (!authManager.isLoggedIn()) {
+                        e.preventDefault();
+                        alert('Please login first to view your posts');
+                        window.location.href = '/api/v1/auth/login';
+                    }
+                });
+            }
+
+            async loadPosts() {
+                try {
+                    const postsList = document.getElementById('postsList');
+                    postsList.innerHTML = '<div class="loading">Loading posts...</div>';
+
+                    const params = new URLSearchParams({
+                        page: this.currentPage,
+                        limit: 10,
+                        category: this.currentCategory,
+                        sort: this.currentSort
+                    });
+
+                    const response = await fetch(`/api/v1/forum/posts?${params}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.renderPosts(result.data.posts);
+                        this.renderPagination(result.data.pagination);
+                    } else {
+                        postsList.innerHTML = `<div class="error-message">Loading failed: ${result.error}</div>`;
+                    }
+                } catch (error) {
+                    console.error('Failed to load posts:', error);
+                    document.getElementById('postsList').innerHTML = '<div class="error-message">Network error, please try again later</div>';
+                }
+            }
+
+            renderPosts(posts) {
+                const postsList = document.getElementById('postsList');
+                
+                if (posts.length === 0) {
+                    postsList.innerHTML = '<div class="empty-state">No posts yet. Be the first to create one!</div>';
+                    return;
+                }
+
+                const postsHTML = posts.map(post => this.createPostHTML(post)).join('');
+                postsList.innerHTML = postsHTML;
+
+                // Bind post click events
+                document.querySelectorAll('.post-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const postId = item.dataset.postId;
+                        window.location.href = `/api/v1/forum/post-detail.html?id=${postId}`;
+                    });
+                });
+            }
+
+            createPostHTML(post) {
+                const categoryMap = {
+                    'general': 'General',
+                    'stocks': 'Stock Analysis',
+                    'market': 'Market Views',
+                    'strategy': 'Investment Strategy',
+                    'news': 'Financial News',
+                    'tech': 'Technical Analysis',
+                    'question': 'Q&A'
+                };
+
+                const categoryName = categoryMap[post.category] || post.category;
+                const timeAgo = this.formatTimeAgo(post.created_at);
+                const isPinned = post.is_pinned ? 'pinned-post' : '';
+
+                const tagsHTML = post.tags.map(tag => 
+                    `<span class="post-tag">#${tag}</span>`
+                ).join('');
+
+                return `
+                    <div class="post-item ${isPinned}" data-post-id="${post.id}">
+                        <div class="post-header">
+                            <div>
+                                <h3 class="post-title">
+                                    ${post.is_pinned ? '📌 ' : ''}${post.title}
+                                </h3>
+                                <div class="post-meta">
+                                    <div class="author-info">
+                                        <div class="author-avatar">${post.author.username.charAt(0).toUpperCase()}</div>
+                                        <span>${post.author.username}</span>
+                                    </div>
+                                    <span>•</span>
+                                    <span>${timeAgo}</span>
+                                    <span class="post-category">${categoryName}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">${post.content}</div>
+                        ${post.tags.length > 0 ? `<div class="post-tags">${tagsHTML}</div>` : ''}
+                        <div class="post-stats">
+                            <span>👍 ${post.likes}</span>
+                            <span>💬 ${post.comment_count}</span>
+                            <span>👀 ${post.views}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderPagination(pagination) {
+                const paginationDiv = document.getElementById('pagination');
+                
+                if (pagination.total_pages <= 1) {
+                    paginationDiv.innerHTML = '';
+                    return;
+                }
+
+                let paginationHTML = '';
+
+                // Previous page button
+                if (pagination.has_prev) {
+                    paginationHTML += `<button onclick="forumManager.changePage(${pagination.current_page - 1})">Previous</button>`;
+                }
+
+                // Page number buttons
+                const startPage = Math.max(1, pagination.current_page - 2);
+                const endPage = Math.min(pagination.total_pages, pagination.current_page + 2);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const activeClass = i === pagination.current_page ? 'active' : '';
+                    paginationHTML += `<button class="${activeClass}" onclick="forumManager.changePage(${i})">${i}</button>`;
+                }
+
+                // Next page button
+                if (pagination.has_next) {
+                    paginationHTML += `<button onclick="forumManager.changePage(${pagination.current_page + 1})">Next</button>`;
+                }
+
+                paginationDiv.innerHTML = paginationHTML;
+            }
+
+            changePage(page) {
+                this.currentPage = page;
+                this.loadPosts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            formatTimeAgo(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+
+                if (diffInMinutes < 1) return 'Just now';
+                if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+                if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+                if (diffInMinutes < 43200) return `${Math.floor(diffInMinutes / 1440)} days ago`;
+                
+                return date.toLocaleDateString('en-US');
+            }
+        }
+
+        // Initialize forum manager
+        let forumManager;
+    </script>
+</body>
+</html>

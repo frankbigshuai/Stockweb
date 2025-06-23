@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Companies - Investing</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            background: #e8f5e8;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #d4edda;
+        }
+        
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .logo-icon {
+            font-size: 18px;
+            color: #28a745;
+        }
+        
+        .logo h2 {
+            margin: 0;
+            color: #2c5530;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links li {
+            position: relative;
+        }
+        
+        .nav-links a {
+            color: #495057;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .nav-links a:hover {
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .nav-links a.active {
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.15);
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            min-width: 200px;
+            justify-content: flex-end;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+        
+        .user-info span {
+            color: #495057;
+            font-weight: 500;
+            font-size: 12px;
+            min-width: 80px;
+        }
+        
+        .user-info a, .user-info button {
+            text-decoration: none;
+            color: #495057;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .user-info a:hover, .user-info button:hover {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            min-width: 60px;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        
+        .btn-outline:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .compare-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .compare-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .compare-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .compare-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .stock-selector {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stock-input {
+            position: relative;
+        }
+
+        .stock-input input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .stock-input input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .search-result-item:hover {
+            background: #f8f9ff;
+        }
+
+        .compare-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .comparison-results {
+            display: none;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stock-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stock-symbol {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stock-name {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .stock-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .price-positive {
+            color: #4CAF50;
+        }
+
+        .price-negative {
+            color: #f44336;
+        }
+
+        .price-change {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .metrics-table {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .metrics-table h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .comparison-table th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-container h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .success {
+            background: #e6ffe6;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        /* 消息提示样式 */
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .message.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        /* 聊天框样式 */
+        .chatbox-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100vh);
+            transition: all 0.3s ease;
+            z-index: 10000;
+        }
+
+        .chatbox-container.active {
+            transform: translateY(0);
+        }
+
+        .chatbox-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .chatbox-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chatbox-message {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .chatbox-message.user {
+            justify-content: flex-end;
+        }
+
+        .chatbox-message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chatbox-message.user .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .chatbox-message.bot .message-bubble {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .chatbox-input {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbox-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chatbox-input input:focus {
+            border-color: #667eea;
+        }
+
+        .chatbox-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .chatbox-input button:hover {
+            background: #5a6fd8;
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            background: #5a6fd8;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f1f3f4;
+            border-radius: 18px;
+            color: #666;
+            font-size: 14px;
+            max-width: 80%;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots div {
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots div:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots div:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 8px 15px;
+            }
+            
+            .navbar-left {
+                gap: 15px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .navbar-right {
+                min-width: 80px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 11px;
+                min-width: 50px;
+            }
+
+            .compare-container {
+                padding: 15px;
+            }
+            
+            .selector-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .compare-header h1 {
+                font-size: 2rem;
+            }
+
+            .chatbox-container {
+                width: 90vw;
+                height: 80vh;
+                bottom: 10px;
+                right: 5vw;
+            }
+
+            .chat-toggle {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="logo">
+                <span class="logo-icon">📈</span>
+                <a href="/" style="text-decoration: none; color: inherit;">
+                    <h2>Investing</h2>
+                </a>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="/stocks.html">Top Companies</a></li>
+                <li><a href="/compare.html" class="active">Comparison Board</a></li>
+                <li><a href="/api/v1/forum/forum.html">Forum</a></li>
+            </ul>
+        </div>
+        
+        <div class="navbar-right">
+            <div class="auth-buttons" id="authButtons">
+                <a href="/api/v1/auth/login" class="btn btn-primary">LOGIN</a>
+            </div>
+            
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span id="welcomeText">Welcome, username</span>
+                <a href="/api/v1/users/profile.html">Profile</a>
+                <button onclick="authManager.logout()" class="btn btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="compare-container">
+        <div class="back-button">
+            <a href="/" class="btn btn-secondary">← Back to Home</a>
+        </div>
+        <div class="compare-header">
+            <h1>📊 Compare Companies</h1>
+            <p>Analyze key financial metrics of different companies</p>
+        </div>
+
+        <!-- Stock Selector -->
+        <div class="stock-selector">
+            <h3 style="text-align: center; margin-bottom: 25px; color: #333;">Select stocks to compare (up to 4)</h3>
+            
+            <div class="selector-grid">
+                <div class="stock-input">
+                    <input type="text" placeholder="Enter stock symbol, e.g. AAPL" data-index="0">
+                    <div class="search-results"></div>
+                </div>
+                <div class="stock-input">
+                    <input type="text" placeholder="Enter stock symbol, e.g. MSFT" data-index="1">
+                    <div class="search-results"></div>
+                </div>
+                <div class="stock-input">
+                    <input type="text" placeholder="Enter stock symbol, e.g. GOOGL" data-index="2">
+                    <div class="search-results"></div>
+                </div>
+                <div class="stock-input">
+                    <input type="text" placeholder="Enter stock symbol, e.g. TSLA" data-index="3">
+                    <div class="search-results"></div>
+                </div>
+            </div>
+
+            <button class="compare-btn" id="compareButton">
+                🔍 Start Comparison
+            </button>
+            
+            <!-- 消息提示区域 -->
+            <div id="message" class="message"></div>
+        </div>
+
+        <!-- Comparison Results -->
+        <div class="comparison-results" id="comparisonResults">
+            <!-- Stock Cards -->
+            <div class="comparison-grid" id="stockCards">
+                <!-- 动态生成的股票卡片会在这里显示 -->
+            </div>
+
+            <!-- Financial Metrics Comparison Table -->
+            <div class="metrics-table">
+                <h3>📈 Key Financial Metrics Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th id="col1">Stock 1</th>
+                            <th id="col2">Stock 2</th>
+                            <th id="col3">Stock 3</th>
+                            <th id="col4">Stock 4</th>
+                        </tr>
+                    </thead>
+                    <tbody id="metricsTableBody">
+                        <!-- 动态生成的指标行会在这里显示 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Price Trend Comparison Chart -->
+            <div class="chart-container">
+                <h3>📊 Price Trend Comparison</h3>
+                <canvas id="priceChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbox -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <div class="chatbox-header">
+            <h3>💬 Investment Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbox()">×</button>
+        </div>
+        
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="chatbox-message bot">
+                <div class="message-bubble">
+                    Hi! I'm your investment assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbox-input">
+            <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-toggle" onclick="toggleChatbox()" id="chatToggle">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
+        </svg>
+    </button>
+    
+    <!-- 首先引入auth.js -->
+    <script src="/js/auth.js"></script>
+    
+    <!-- 然后定义股票比较功能 -->
+    <script>
+        console.log('🚀 加载股票比较页面脚本');
+
+        class StockComparison {
+            constructor() {
+                this.selectedStocks = [];
+                this.searchTimeout = null;
+                this.priceChart = null;
+                console.log('📊 StockComparison 类初始化完成');
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                console.log('🔗 初始化事件监听器');
+                
+                // 搜索输入事件
+                document.querySelectorAll('.stock-input input').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        this.handleSearchInput(e);
+                    });
+
+                    input.addEventListener('blur', (e) => {
+                        setTimeout(() => {
+                            this.hideSearchResults(e.target);
+                        }, 200);
+                    });
+                });
+
+                // 比较按钮事件 - 使用事件监听器而不是onclick
+                const compareButton = document.getElementById('compareButton');
+                if (compareButton) {
+                    compareButton.addEventListener('click', () => {
+                        console.log('🔍 点击比较按钮');
+                        this.compareStocks();
+                    });
+                    console.log('✅ 比较按钮事件绑定成功');
+                } else {
+                    console.error('❌ 找不到比较按钮');
+                }
+            }
+
+            handleSearchInput(event) {
+                const input = event.target;
+                const query = input.value.trim();
+                
+                if (this.searchTimeout) {
+                    clearTimeout(this.searchTimeout);
+                }
+
+                if (query.length < 1) {
+                    this.hideSearchResults(input);
+                    return;
+                }
+
+                this.searchTimeout = setTimeout(() => {
+                    this.searchStocks(query, input);
+                }, 300);
+            }
+
+            async searchStocks(query, inputElement) {
+                try {
+                    console.log(`🔍 搜索股票: ${query}`);
+                    const response = await fetch(`/api/v1/stocks/search?q=${encodeURIComponent(query)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('搜索API响应:', result);
+
+                    if (result.success && result.data && result.data.length > 0) {
+                        this.showSearchResults(result.data, inputElement);
+                    } else {
+                        this.hideSearchResults(inputElement);
+                        console.log('没有找到搜索结果');
+                    }
+                } catch (error) {
+                    console.error('搜索API失败:', error);
+                    this.hideSearchResults(inputElement);
+                    this.showMessage('搜索失败，请检查网络连接', 'error');
+                }
+            }
+
+            showSearchResults(results, inputElement) {
+                const resultsContainer = inputElement.parentElement.querySelector('.search-results');
+                
+                if (!resultsContainer) {
+                    console.error('找不到搜索结果容器');
+                    return;
+                }
+
+                if (results.length === 0) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+
+                resultsContainer.innerHTML = results.map(stock => `
+                    <div class="search-result-item" onclick="window.stockComparison.selectStock('${stock.symbol}', '${stock.name}', ${inputElement.dataset.index})">
+                        <strong>${stock.symbol}</strong> - ${stock.name}
+                    </div>
+                `).join('');
+
+                resultsContainer.style.display = 'block';
+            }
+
+            hideSearchResults(inputElement) {
+                const resultsContainer = inputElement.parentElement.querySelector('.search-results');
+                if (resultsContainer) {
+                    resultsContainer.style.display = 'none';
+                }
+            }
+
+            selectStock(symbol, name, index) {
+                const input = document.querySelector(`input[data-index="${index}"]`);
+                if (input) {
+                    input.value = symbol;
+                    this.hideSearchResults(input);
+                    console.log(`选择股票: ${symbol} - ${name}`);
+                }
+            }
+
+            async compareStocks() {
+                console.log('🚀 开始股票比较');
+                const inputs = document.querySelectorAll('.stock-input input');
+                const symbols = [];
+                
+                inputs.forEach(input => {
+                    const value = input.value.trim().toUpperCase();
+                    if (value) {
+                        symbols.push(value);
+                    }
+                });
+
+                if (symbols.length < 2) {
+                    this.showMessage('请至少选择2只股票进行比较', 'error');
+                    return;
+                }
+
+                if (symbols.length > 4) {
+                    this.showMessage('最多可以比较4只股票', 'error');
+                    return;
+                }
+
+                console.log('开始股票比较:', symbols);
+                this.showLoading();
+
+                try {
+                    const stocksData = await Promise.all(
+                        symbols.map(symbol => this.getStockDetail(symbol))
+                    );
+
+                    console.log('获取的股票数据:', stocksData);
+
+                    const validStocks = stocksData.filter(stock => stock !== null);
+
+                    console.log('有效的股票数据:', validStocks);
+
+                    if (validStocks.length < 2) {
+                        this.showMessage('获取股票数据失败，请检查股票代码是否正确', 'error');
+                        return;
+                    }
+
+                    this.selectedStocks = validStocks;
+                    console.log('准备显示比较结果，股票数量:', this.selectedStocks.length);
+                    this.displayComparison();
+                    this.showMessage(`成功比较了 ${validStocks.length} 只股票`, 'success');
+
+                } catch (error) {
+                    console.error('比较失败:', error);
+                    this.showMessage('比较失败，请稍后重试', 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            async getStockDetail(symbol) {
+                try {
+                    console.log(`获取股票详情: ${symbol}`);
+                    const response = await fetch(`/api/v1/stocks/detail/${symbol}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log(`${symbol} API响应:`, result);
+
+                    if (result.success && result.data) {
+                        console.log(`${symbol} 数据:`, result.data);
+                        return result.data;
+                    } else {
+                        console.error(`获取 ${symbol} 失败:`, result.error || '无数据');
+                        return null;
+                    }
+                } catch (error) {
+                    console.error(`获取 ${symbol} 失败:`, error);
+                    return null;
+                }
+            }
+
+            displayComparison() {
+                console.log('=== 开始显示对比结果 ===');
+                console.log('选中的股票数据:', this.selectedStocks);
+                
+                this.hideLoading();
+                
+                const comparisonResults = document.getElementById('comparisonResults');
+                console.log('comparisonResults元素:', comparisonResults);
+                
+                if (comparisonResults) {
+                    comparisonResults.style.display = 'block';
+                    console.log('✅ 显示了comparison results容器');
+                } else {
+                    console.error('❌ comparisonResults容器不存在');
+                    return;
+                }
+                
+                console.log('=== 开始渲染过程 ===');
+                
+                try {
+                    console.log('🎯 开始渲染股票卡片...');
+                    this.renderStockCards();
+                    console.log('✅ 股票卡片渲染完成');
+                } catch (error) {
+                    console.error('❌ 股票卡片渲染失败:', error);
+                }
+                
+                try {
+                    console.log('🎯 开始渲染指标表格...');
+                    this.renderMetricsTable();
+                    console.log('✅ 指标表格渲染完成');
+                } catch (error) {
+                    console.error('❌ 指标表格渲染失败:', error);
+                }
+                
+                try {
+                    console.log('🎯 开始渲染价格图表...');
+                    this.renderPriceChart();
+                    console.log('✅ 价格图表渲染完成');
+                } catch (error) {
+                    console.error('❌ 价格图表渲染失败:', error);
+                }
+                
+                setTimeout(() => {
+                    comparisonResults.scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                }, 200);
+            }
+
+            renderStockCards() {
+                console.log('开始渲染股票卡片');
+                let container = document.getElementById('stockCards');
+                
+                if (!container) {
+                    console.error('无法找到股票卡片容器');
+                    return;
+                }
+
+                console.log('找到容器，开始渲染股票卡片, 股票数量:', this.selectedStocks.length);
+                
+                if (!this.selectedStocks || this.selectedStocks.length === 0) {
+                    console.error('没有选中的股票数据');
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">没有股票数据</div>';
+                    return;
+                }
+                
+                const cardsHtml = this.selectedStocks.map((stock, index) => {
+                    console.log(`渲染第 ${index + 1} 只股票:`, stock);
+                    
+                    const price = stock.price || stock.current_price || 0;
+                    const change = stock.change || stock.price_change || 0;
+                    const changePercent = stock.change_percent || stock.price_change_percent || 0;
+                    const companyName = stock.company_name || stock.name || stock.symbol;
+                    
+                    return `
+                        <div class="stock-card">
+                            <div class="stock-symbol">${stock.symbol}</div>
+                            <div class="stock-name">${companyName}</div>
+                            <div class="stock-price ${parseFloat(change) >= 0 ? 'price-positive' : 'price-negative'}">
+                                ${parseFloat(price).toFixed(2)}
+                            </div>
+                            <div class="price-change ${parseFloat(change) >= 0 ? 'price-positive' : 'price-negative'}">
+                                ${parseFloat(change) >= 0 ? '+' : ''}${parseFloat(change).toFixed(2)} 
+                                (${parseFloat(changePercent).toFixed(2)}%)
+                            </div>
+                            <div style="margin-top: 15px; color: #666; font-size: 14px;">
+                                <div>Industry: ${stock.industry || 'N/A'}</div>
+                                <div>Sector: ${stock.sector || 'N/A'}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                console.log('生成的HTML长度:', cardsHtml.length);
+                container.innerHTML = cardsHtml;
+                console.log('股票卡片渲染完成');
+                
+                const renderedCards = container.querySelectorAll('.stock-card');
+                console.log('实际渲染的卡片数量:', renderedCards.length);
+            }
+
+            renderMetricsTable() {
+                console.log('开始渲染指标表格');
+                
+                // 更新表格列标题
+                this.selectedStocks.forEach((stock, index) => {
+                    const col = document.getElementById(`col${index + 1}`);
+                    if (col) {
+                        col.textContent = stock.symbol;
+                        col.style.display = 'table-cell';
+                        console.log(`设置列${index + 1}标题为: ${stock.symbol}`);
+                    }
+                });
+
+                // 隐藏多余的列
+                for (let i = this.selectedStocks.length; i < 4; i++) {
+                    const col = document.getElementById(`col${i + 1}`);
+                    if (col) {
+                        col.style.display = 'none';
+                        console.log(`隐藏列${i + 1}`);
+                    }
+                }
+
+                // 定义指标
+                const metrics = [
+                    { label: 'Current Price', key: 'price', format: 'currency' },
+                    { label: 'Change %', key: 'change_percent', format: 'percentage' },
+                    { label: 'Volume', key: 'volume', format: 'number' },
+                    { label: 'Market Cap', key: 'market_cap', format: 'currency_large' },
+                    { label: 'P/E Ratio', key: 'pe_ratio', format: 'number' },
+                    { label: 'Beta', key: 'beta', format: 'number' },
+                    { label: '52 Week High', key: '52_week_high', format: 'currency' },
+                    { label: '52 Week Low', key: '52_week_low', format: 'currency' },
+                    { label: 'Dividend Yield', key: 'dividend_yield', format: 'percentage' },
+                    { label: 'EPS', key: 'eps', format: 'currency' }
+                ];
+
+                let tbody = document.getElementById('metricsTableBody');
+                
+                if (!tbody) {
+                    console.error('无法找到指标表格tbody');
+                    return;
+                }
+
+                const rowsHtml = metrics.map(metric => `
+                    <tr>
+                        <td style="font-weight: 600; text-align: left;">${metric.label}</td>
+                        ${this.selectedStocks.map(stock => `
+                            <td>${this.formatMetricValue(stock[metric.key], metric.format)}</td>
+                        `).join('')}
+                        ${Array(4 - this.selectedStocks.length).fill('<td style="display: none;"></td>').join('')}
+                    </tr>
+                `).join('');
+
+                tbody.innerHTML = rowsHtml;
+                console.log('指标表格渲染完成，行数:', metrics.length);
+            }
+
+            formatMetricValue(value, format) {
+                if (value === null || value === undefined || value === 'N/A' || value === '') {
+                    return 'N/A';
+                }
+
+                const numValue = parseFloat(value);
+                if (isNaN(numValue)) {
+                    return 'N/A';
+                }
+
+                switch (format) {
+                    case 'currency':
+                        return `${numValue.toFixed(2)}`;
+                    case 'currency_large':
+                        if (numValue >= 1e12) {
+                            return `${(numValue / 1e12).toFixed(2)}T`;
+                        } else if (numValue >= 1e9) {
+                            return `${(numValue / 1e9).toFixed(2)}B`;
+                        } else if (numValue >= 1e6) {
+                            return `${(numValue / 1e6).toFixed(2)}M`;
+                        } else {
+                            return `${numValue.toLocaleString()}`;
+                        }
+                    case 'percentage':
+                        return `${numValue.toFixed(2)}%`;
+                    case 'number':
+                        if (numValue >= 1e9) {
+                            return `${(numValue / 1e9).toFixed(2)}B`;
+                        } else if (numValue >= 1e6) {
+                            return `${(numValue / 1e6).toFixed(2)}M`;
+                        } else if (numValue >= 1000) {
+                            return `${(numValue / 1000).toFixed(1)}K`;
+                        } else {
+                            return numValue.toFixed(2);
+                        }
+                    default:
+                        return numValue.toFixed(2);
+                }
+            }
+
+            renderPriceChart() {
+                if (this.priceChart) {
+                    this.priceChart.destroy();
+                }
+
+                const ctx = document.getElementById('priceChart');
+                if (!ctx) {
+                    console.error('找不到价格图表canvas');
+                    return;
+                }
+
+                const chartContext = ctx.getContext('2d');
+                
+                const labels = [];
+                const datasets = [];
+                
+                // 生成30天的日期标签
+                for (let i = 29; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString());
+                }
+
+                const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
+                
+                // 为每只股票生成模拟价格数据
+                this.selectedStocks.forEach((stock, index) => {
+                    const basePrice = parseFloat(stock.price || 100);
+                    const data = [];
+                    
+                    let currentPrice = basePrice * 0.95;
+                    for (let i = 0; i < 30; i++) {
+                        data.push(currentPrice);
+                        currentPrice *= (1 + (Math.random() - 0.5) * 0.04);
+                    }
+                    
+                    datasets.push({
+                        label: stock.symbol,
+                        data: data,
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: colors[index % colors.length] + '20',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.1
+                    });
+                });
+
+                this.priceChart = new Chart(chartContext, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Price ($)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            showLoading() {
+                const container = document.getElementById('comparisonResults');
+                if (container) {
+                    container.style.display = 'block';
+                    container.innerHTML = `
+                        <div class="loading">🔄 加载股票数据中...</div>
+                        
+                        <div class="comparison-grid" id="stockCards">
+                        </div>
+
+                        <div class="metrics-table">
+                            <h3>📈 Key Financial Metrics Comparison</h3>
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th id="col1">Stock 1</th>
+                                        <th id="col2">Stock 2</th>
+                                        <th id="col3">Stock 3</th>
+                                        <th id="col4">Stock 4</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="metricsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>📊 Price Trend Comparison</h3>
+                            <canvas id="priceChart" width="400" height="200"></canvas>
+                        </div>
+                    `;
+                }
+            }
+
+            hideLoading() {
+                const loadingDiv = document.querySelector('.loading');
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+
+            showMessage(message, type) {
+                const existingMessages = document.querySelectorAll('.error, .success, .message');
+                existingMessages.forEach(msg => msg.remove());
+
+                const messageDiv = document.getElementById('message');
+                if (messageDiv) {
+                    messageDiv.textContent = message;
+                    messageDiv.className = `message ${type}`;
+                    messageDiv.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 3000);
+                } else {
+                    console.log(`Message (${type}):`, message);
+                    if (type === 'error') {
+                        alert(message);
+                    }
+                }
+            }
+        }
+
+        // 全局变量声明
+        let stockComparison = null;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('📄 compare.html DOMContentLoaded 事件触发');
+            
+            // 等待 auth.js 完全加载
+            if (typeof authManager === 'undefined') {
+                console.log('⏳ 等待 authManager 加载...');
+                // 简单的等待机制
+                let attempts = 0;
+                const waitForAuth = setInterval(() => {
+                    attempts++;
+                    if (typeof authManager !== 'undefined' || attempts > 10) {
+                        clearInterval(waitForAuth);
+                        initializePage();
+                    }
+                }, 100);
+            } else {
+                initializePage();
+            }
+        });
+
+        async function initializePage() {
+            console.log('🚀 开始初始化compare页面');
+            
+            // 初始化认证状态 (这部分由auth.js处理)
+            if (typeof authManager !== 'undefined') {
+                console.log('✅ AuthManager 可用');
+                
+                if (authManager.isLoggedIn()) {
+                    console.log('用户已登录，验证token...');
+                    const isValid = await authManager.verifyToken();
+                    if (isValid) {
+                        updateUIForLoggedInUser();
+                    } else {
+                        updateUIForLoggedOutUser();
+                    }
+                } else {
+                    console.log('用户未登录');
+                    updateUIForLoggedOutUser();
+                }
+            } else {
+                console.warn('⚠️ AuthManager 未加载，跳过认证初始化');
+            }
+            
+            // 初始化股票比较功能
+            console.log('📊 初始化股票比较功能');
+            stockComparison = new StockComparison();
+            
+            // 将stockComparison暴露到全局作用域，供HTML调用
+            window.stockComparison = stockComparison;
+            
+            console.log('✅ compare.html 初始化完成');
+        }
+
+        // 全局函数，供HTML调用（备用方案）
+        function compareStocks() {
+            console.log('🔍 全局compareStocks函数被调用');
+            if (window.stockComparison) {
+                window.stockComparison.compareStocks();
+            } else {
+                console.error('❌ stockComparison 未初始化');
+                alert('股票比较功能未初始化，请刷新页面');
+            }
+        }
+
+        // 暴露到全局作用域
+        window.compareStocks = compareStocks;
+        
+        console.log('📄 compare.html 脚本加载完成');
+    </script>
+        
+</body>
+</html>

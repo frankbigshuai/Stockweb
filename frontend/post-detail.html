@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Details - Stock Web</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .post-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .post-detail {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .post-header {
+            padding: 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .post-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin: 0 0 15px 0;
+            line-height: 1.3;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .post-category {
+            background: #e9ecef;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .post-tag {
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .post-content {
+            padding: 30px;
+            color: #333;
+            line-height: 1.8;
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+
+        .post-actions {
+            padding: 20px 30px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .action-btn.liked {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #1976d2;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .comments-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .comments-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comment-form {
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comment-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .comment-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .comments-list {
+            padding: 20px 30px;
+        }
+
+        .comment-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #28a745;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .comment-content {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 15px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .comment-action {
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .comment-action:hover {
+            color: #007bff;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .empty-comments {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .post-detail-container {
+                padding: 10px;
+            }
+            
+            .post-header,
+            .post-content,
+            .post-actions {
+                padding: 20px;
+            }
+            
+            .comments-header,
+            .comment-form,
+            .comments-list {
+                padding: 15px 20px;
+            }
+            
+            .post-actions {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="post-detail-container">
+        <!-- Back button -->
+        <div style="margin-bottom: 20px;">
+            <a href="/api/v1/forum/forum.html" class="btn btn-secondary">← Back to Forum</a>
+        </div>
+
+        <!-- Post details -->
+        <div class="post-detail" id="postDetail">
+            <div class="loading">Loading post...</div>
+        </div>
+
+        <!-- Comments section -->
+        <div class="comments-section" id="commentsSection" style="display: none;">
+            <div class="comments-header">
+                <h3>Comments (<span id="commentCount">0</span>)</h3>
+            </div>
+
+            <!-- Comment form -->
+            <div class="comment-form" id="commentForm" style="display: none;">
+                <textarea id="commentInput" class="comment-input" placeholder="Share your thoughts..."></textarea>
+                <div class="comment-form-actions">
+                    <button type="button" id="cancelCommentBtn" class="btn btn-secondary">Cancel</button>
+                    <button type="button" id="submitCommentBtn" class="btn btn-primary">Post Comment</button>
+                </div>
+            </div>
+
+            <!-- Comments list -->
+            <div class="comments-list" id="commentsList">
+                <div class="loading">Loading comments...</div>
+            </div>
+        </div>
+
+        <!-- Message display area -->
+        <div id="messageContainer"></div>
+    </div>
+    <!-- Chatbox -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <div class="chatbox-header">
+            <h3>💬 Investment Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbox()">×</button>
+        </div>
+        
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="chatbox-message bot">
+                <div class="message-bubble">
+                    Hi! I'm your investment assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbox-input">
+            <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-toggle" onclick="toggleChatbox()" id="chatToggle">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
+        </svg>
+    </button>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        class PostDetailManager {
+            constructor() {
+                this.postId = null;
+                this.post = null;
+                this.comments = [];
+                this.init();
+            }
+
+            init() {
+                this.postId = this.getPostIdFromUrl();
+                if (!this.postId) {
+                    this.showError('Invalid post ID');
+                    return;
+                }
+
+                this.bindEvents();
+                this.loadPost();
+                this.loadComments();
+            }
+
+            getPostIdFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('id');
+            }
+
+            bindEvents() {
+                // Post comment button
+                document.addEventListener('click', (e) => {
+                    if (e.target.id === 'addCommentBtn') {
+                        this.showCommentForm();
+                    }
+                });
+
+                // Comment form buttons
+                document.getElementById('submitCommentBtn').addEventListener('click', () => {
+                    this.submitComment();
+                });
+
+                document.getElementById('cancelCommentBtn').addEventListener('click', () => {
+                    this.hideCommentForm();
+                });
+            }
+
+            async loadPost() {
+                try {
+                    const response = await fetch(`/api/v1/forum/posts/${this.postId}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.post = result.data;
+                        this.renderPost();
+                    } else {
+                        this.showError(result.error);
+                    }
+                } catch (error) {
+                    console.error('Failed to load post:', error);
+                    this.showError('Network error, please try again later');
+                }
+            }
+
+            async loadComments() {
+                try {
+                    const response = await fetch(`/api/v1/forum/posts/${this.postId}/comments`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.comments = result.data;
+                        this.renderComments();
+                        document.getElementById('commentsSection').style.display = 'block';
+                    } else {
+                        console.error('Failed to load comments:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Failed to load comments:', error);
+                }
+            }
+
+            renderPost() {
+                const categoryMap = {
+                    'general': 'General Discussion',
+                    'stocks': 'Stock Analysis',
+                    'market': 'Market Perspectives',
+                    'strategy': 'Investment Strategies',
+                    'news': 'Financial News',
+                    'tech': 'Technical Analysis',
+                    'question': 'Beginner Questions'
+                };
+
+                const categoryName = categoryMap[this.post.category] || this.post.category;
+                const timeAgo = this.formatTimeAgo(this.post.created_at);
+
+                const tagsHTML = this.post.tags.map(tag => 
+                    `<span class="post-tag">#${tag}</span>`
+                ).join('');
+
+                const isLoggedIn = authManager.isLoggedIn();
+                const currentUserId = isLoggedIn ? authManager.user?.user_id : null;
+                const isAuthor = currentUserId === this.post.author.id;
+
+                document.getElementById('postDetail').innerHTML = `
+                    <div class="post-header">
+                        <h1 class="post-title">${this.post.title}</h1>
+                        <div class="post-meta">
+                            <div class="author-info">
+                                <div class="author-avatar">${this.post.author.username.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <div><strong>${this.post.author.username}</strong></div>
+                                    <div>${timeAgo}</div>
+                                </div>
+                            </div>
+                            <span class="post-category">${categoryName}</span>
+                        </div>
+                        ${this.post.tags.length > 0 ? `<div class="post-tags">${tagsHTML}</div>` : ''}
+                    </div>
+                    
+                    <div class="post-content">${this.post.content}</div>
+                    
+                    <div class="post-actions">
+                        <div class="action-buttons">
+                            ${isLoggedIn ? `<button class="action-btn" id="likeBtn" onclick="postDetailManager.toggleLike()">
+                                <span>👍</span> <span id="likeText">Like</span>
+                            </button>` : ''}
+                            ${isLoggedIn ? `<button class="action-btn" id="addCommentBtn">
+                                <span>💬</span> Comment
+                            </button>` : ''}
+                            ${isAuthor ? `<button class="action-btn" onclick="postDetailManager.editPost()">
+                                <span>✏️</span> Edit
+                            </button>` : ''}
+                            ${isAuthor ? `<button class="action-btn" onclick="postDetailManager.deletePost()">
+                                <span>🗑️</span> Delete
+                            </button>` : ''}
+                        </div>
+                        
+                        <div class="post-stats">
+                            <span>👍 ${this.post.likes}</span>
+                            <span>💬 ${this.post.comment_count}</span>
+                            <span>👀 ${this.post.views}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderComments() {
+                const commentsList = document.getElementById('commentsList');
+                const commentCount = document.getElementById('commentCount');
+                
+                commentCount.textContent = this.comments.length;
+
+                if (this.comments.length === 0) {
+                    commentsList.innerHTML = '<div class="empty-comments">No comments yet, be the first to comment!</div>';
+                    return;
+                }
+
+                const commentsHTML = this.comments.map(comment => this.createCommentHTML(comment)).join('');
+                commentsList.innerHTML = commentsHTML;
+            }
+
+            createCommentHTML(comment) {
+                const timeAgo = this.formatTimeAgo(comment.created_at);
+                const isLoggedIn = authManager.isLoggedIn();
+                const currentUserId = isLoggedIn ? authManager.user?.user_id : null;
+                const isAuthor = currentUserId === comment.author.id;
+
+                return `
+                    <div class="comment-item" data-comment-id="${comment.id}">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <div class="comment-author-avatar">${comment.author.username.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <div><strong>${comment.author.username}</strong></div>
+                                    <div style="font-size: 12px; color: #888;">${timeAgo}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comment-content">${comment.content}</div>
+                        <div class="comment-actions">
+                            ${isLoggedIn ? `<span class="comment-action">👍 ${comment.likes}</span>` : ''}
+                            ${isLoggedIn ? `<span class="comment-action">Reply</span>` : ''}
+                            ${isAuthor ? `<span class="comment-action" onclick="postDetailManager.deleteComment('${comment.id}')">Delete</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            showCommentForm() {
+                if (!authManager.isLoggedIn()) {
+                    alert('Please log in to comment');
+                    window.location.href = '/api/v1/auth/login';
+                    return;
+                }
+
+                document.getElementById('commentForm').style.display = 'block';
+                document.getElementById('commentInput').focus();
+            }
+
+            hideCommentForm() {
+                document.getElementById('commentForm').style.display = 'none';
+                document.getElementById('commentInput').value = '';
+            }
+
+            async submitComment() {
+                const content = document.getElementById('commentInput').value.trim();
+                
+                if (!content) {
+                    this.showMessage('Please enter comment content', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await this.makeAuthenticatedRequest(`/api/v1/forum/posts/${this.postId}/comments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ content })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showMessage('Comment posted successfully', 'success');
+                        this.hideCommentForm();
+                        this.loadComments();
+                        // Update post comment count
+                        this.post.comment_count++;
+                        this.updatePostStats();
+                    } else {
+                        this.showMessage(`Failed to post comment: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Failed to submit comment:', error);
+                    this.showMessage('Network error, please try again later', 'error');
+                }
+            }
+
+            async toggleLike() {
+                if (!authManager.isLoggedIn()) {
+                    alert('Please log in to like');
+                    window.location.href = '/api/v1/auth/login';
+                    return;
+                }
+
+                try {
+                    const response = await this.makeAuthenticatedRequest(`/api/v1/forum/posts/${this.postId}/like`, {
+                        method: 'POST'
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const likeBtn = document.getElementById('likeBtn');
+                        const likeText = document.getElementById('likeText');
+                        
+                        if (result.data.liked) {
+                            likeBtn.classList.add('liked');
+                            likeText.textContent = 'Liked';
+                            this.post.likes++;
+                        } else {
+                            likeBtn.classList.remove('liked');
+                            likeText.textContent = 'Like';
+                            this.post.likes--;
+                        }
+                        
+                        this.updatePostStats();
+                    }
+                } catch (error) {
+                    console.error('Failed to toggle like:', error);
+                }
+            }
+
+            async deleteComment(commentId) {
+                if (!confirm('Are you sure you want to delete this comment?')) {
+                    return;
+                }
+
+                try {
+                    const response = await this.makeAuthenticatedRequest(`/api/v1/forum/comments/${commentId}`, {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showMessage('Comment deleted successfully', 'success');
+                        this.loadComments();
+                        this.post.comment_count--;
+                        this.updatePostStats();
+                    } else {
+                        this.showMessage(`Failed to delete: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Failed to delete comment:', error);
+                    this.showMessage('Network error, please try again later', 'error');
+                }
+            }
+
+            editPost() {
+                // Can redirect to edit page or show edit form
+                alert('Edit feature not implemented yet');
+            }
+
+            async deletePost() {
+                if (!confirm('Are you sure you want to delete this post? This action cannot be undone!')) {
+                    return;
+                }
+
+                try {
+                    const response = await this.makeAuthenticatedRequest(`/api/v1/forum/posts/${this.postId}`, {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('Post deleted successfully');
+                        window.location.href = '/api/v1/forum/forum.html';
+                    } else {
+                        this.showMessage(`Failed to delete: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Failed to delete post:', error);
+                    this.showMessage('Network error, please try again later', 'error');
+                }
+            }
+
+            updatePostStats() {
+                const statsElement = document.querySelector('.post-stats');
+                if (statsElement) {
+                    statsElement.innerHTML = `
+                        <span>👍 ${this.post.likes}</span>
+                        <span>💬 ${this.post.comment_count}</span>
+                        <span>👀 ${this.post.views}</span>
+                    `;
+                }
+            }
+
+            async makeAuthenticatedRequest(url, options = {}) {
+                const headers = {
+                    ...authManager.getAuthHeaders(),
+                    ...options.headers
+                };
+                
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+                
+                if (response.status === 401) {
+                    authManager.clearAuthInfo();
+                    alert('Login expired, please log in again');
+                    window.location.href = '/api/v1/auth/login';
+                    return null;
+                }
+                
+                return response;
+            }
+
+            formatTimeAgo(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+
+                if (diffInMinutes < 1) return 'Just now';
+                if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+                if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+                if (diffInMinutes < 43200) return `${Math.floor(diffInMinutes / 1440)} days ago`;
+                
+                return date.toLocaleDateString('en-US');
+            }
+
+            showError(message) {
+                document.getElementById('postDetail').innerHTML = `<div class="error-message">${message}</div>`;
+            }
+
+            showMessage(message, type) {
+                const messageContainer = document.getElementById('messageContainer');
+                const messageClass = type === 'success' ? 'success-message' : 'error-message';
+                
+                messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+                
+                setTimeout(() => {
+                    messageContainer.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Initialize post detail manager
+        let postDetailManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            postDetailManager = new PostDetailManager();
+        });
+    </script>
+</body>
+</html>

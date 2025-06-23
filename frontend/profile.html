@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Stock Web</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .profile-section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        
+        .form-group input[readonly] {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* 修改后的 Back to Home 按键样式 - 与 stocks.html 保持一致 */
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            text-decoration: none;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            background: #f8f9fa;
+        }
+        
+        .tab:hover {
+            color: #007bff;
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stock-card {
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        
+        .stock-symbol {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .stock-details {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .stock-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stock-change {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stock-change.positive {
+            color: #28a745;
+        }
+        
+        .stock-change.negative {
+            color: #dc3545;
+        }
+        
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s ease;
+            width: 100%;
+        }
+        
+        .remove-btn:hover {
+            background: #c82333;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .message.success {
+            background-color: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .message.error {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px 20px;
+        }
+        
+        .section-title {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        /* 聊天框样式 */
+        .chatbox-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100vh);
+            transition: all 0.3s ease;
+            z-index: 10000;
+        }
+
+        .chatbox-container.active {
+            transform: translateY(0);
+        }
+
+        .chatbox-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .chatbox-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chatbox-message {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .chatbox-message.user {
+            justify-content: flex-end;
+        }
+
+        .chatbox-message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chatbox-message.user .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .chatbox-message.bot .message-bubble {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .chatbox-input {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbox-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chatbox-input input:focus {
+            border-color: #667eea;
+        }
+
+        .chatbox-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .chatbox-input button:hover {
+            background: #5a6fd8;
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body data-require-auth="true">
+    <div class="profile-container">
+        <!-- 修改后的 Back to Home 按钮 -->
+        <div class="back-button">
+            <a href="/" class="btn-secondary">← Back to Home</a>
+        </div>
+        
+        <div class="profile-header">
+            <div class="avatar" id="userAvatar">👤</div>
+            <h1 id="userName">Loading...</h1>
+            <p id="userEmail">...</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('basic')">Basic Information</div>
+            <div class="tab" onclick="switchTab('favorites')">My Watchlist</div>
+            <div class="tab" onclick="switchTab('security')">Security Settings</div>
+        </div>
+
+        <div id="basic" class="tab-content active">
+            <div class="profile-section">
+                <h2 class="section-title">Personal Information</h2>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter email address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Registration Date</label>
+                        <input type="text" id="createdAt" readonly>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="updateBtn">Update Profile</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="favorites" class="tab-content">
+            <div class="profile-section">
+                <h2 class="section-title">My Watchlist</h2>
+                <div id="favoritesList" class="loading">
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <div id="security" class="tab-content">
+            <div class="profile-section">
+                <h2 class="section-title">Change Password</h2>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" name="oldPassword" required placeholder="Enter current password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="newPassword" required placeholder="Enter new password (at least 6 characters)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" name="confirmPassword" required placeholder="Re-enter new password">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="passwordBtn">Change Password</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+    <!-- Chatbox -->
+    <div class="chatbox-container" id="chatboxContainer">
+        <div class="chatbox-header">
+            <h3>💬 Investment Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbox()">×</button>
+        </div>
+        
+        <div class="chatbox-messages" id="chatboxMessages">
+            <div class="chatbox-message bot">
+                <div class="message-bubble">
+                    Hi! I'm your investment assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbox-input">
+            <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <button class="chat-toggle" onclick="toggleChatbox()" id="chatToggle">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
+        </svg>
+    </button>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        console.log('Profile page script started');
+
+        // Load user data after page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Profile page DOMContentLoaded');
+            
+            if (authManager.isLoggedIn()) {
+                console.log('User is logged in, starting data load');
+                await loadUserProfile();
+                await loadUserFavorites();
+            } else {
+                console.log('User not logged in, redirecting to login page');
+                alert('Please log in first.');
+                window.location.href = '/api/v1/auth/login';
+            }
+        });
+
+        async function loadUserProfile() {
+            try {
+                console.log('Starting to load user profile...');
+                const response = await authenticatedFetch('/api/v1/users/profile');
+                
+                if (!response) {
+                    console.log('Request failed, user may need to log in again.');
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('User profile response:', result);
+                
+                if (result.success && result.data) {
+                    const user = result.data;
+                    
+                    // Update page display
+                    document.getElementById('userName').textContent = user.username || 'Unknown User';
+                    document.getElementById('userEmail').textContent = user.email || 'Email not set';
+                    document.getElementById('username').value = user.username || '';
+                    document.getElementById('email').value = user.email || '';
+                    
+                    if (user.created_at) {
+                        const createdDate = new Date(user.created_at);
+                        document.getElementById('createdAt').value = createdDate.toLocaleString('en-US'); // Changed to en-US for English locale
+                    } else {
+                        document.getElementById('createdAt').value = 'Unknown';
+                    }
+                    
+                    console.log('User profile loaded successfully.');
+                } else {
+                    console.error('Failed to get user profile:', result);
+                    showMessage('Failed to get user profile: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('An error occurred while loading user profile:', error);
+                showMessage('Failed to load user profile, please refresh the page and try again.', 'error');
+            }
+        }
+
+        async function loadUserFavorites() {
+            try {
+                console.log('Starting to load user favorites...');
+                const response = await authenticatedFetch('/api/v1/users/favorites');
+                
+                if (!response) {
+                    console.log('Failed to get favorites, user may need to log in again.');
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('Favorites response:', result);
+                
+                const favoritesList = document.getElementById('favoritesList');
+                
+                if (result.success && Array.isArray(result.data)) {
+                    if (result.data.length === 0) {
+                        favoritesList.innerHTML = '<div class="empty-state">You haven\'t added any stocks to your watchlist yet.<br>Go to the stocks page to add stocks you\'re interested in!</div>';
+                    } else {
+                        // 🔧 Fix: Correctly process watchlist data
+                        let favoritesHTML = '<div class="favorites-grid">';
+                        
+                        result.data.forEach(favoriteData => {
+                            // Check data type and handle different return formats
+                            let symbol, price, change, changePercent;
+                            
+                            if (typeof favoriteData === 'string') {
+                                // If a string (stock symbol) is returned
+                                symbol = favoriteData;
+                                price = 'N/A';
+                                change = 'N/A';
+                                changePercent = 'N/A';
+                            } else if (typeof favoriteData === 'object' && favoriteData !== null) {
+                                // If an object (with detailed info) is returned
+                                symbol = favoriteData.symbol || 'N/A';
+                                price = favoriteData.price !== undefined && favoriteData.price !== 'N/A' ? 
+                                       `$${parseFloat(favoriteData.price).toFixed(2)}` : 'N/A';
+                                change = favoriteData.change !== undefined && favoriteData.change !== 'N/A' ? 
+                                        parseFloat(favoriteData.change).toFixed(2) : 'N/A';
+                                changePercent = favoriteData.change_percent !== undefined && favoriteData.change_percent !== 'N/A' ? 
+                                               `${parseFloat(favoriteData.change_percent).toFixed(2)}%` : 'N/A';
+                            } else {
+                                // Handle unexpected cases
+                                console.warn('Unexpected favorite data format:', favoriteData);
+                                symbol = 'Unknown';
+                                price = 'N/A';
+                                change = 'N/A';
+                                changePercent = 'N/A';
+                            }
+                            
+                            // Generate card HTML
+                            favoritesHTML += `
+                                <div class="stock-card" onclick="goToStockDetail('${symbol}')">
+                                    <div class="stock-symbol">${symbol}</div>
+                                    <div class="stock-details">
+                                        <div class="stock-price">${price}</div>
+                                        <div class="stock-change ${change !== 'N/A' && parseFloat(change) >= 0 ? 'positive' : 'negative'}">
+                                            ${change !== 'N/A' ? (parseFloat(change) >= 0 ? '+' : '') + change : 'N/A'}
+                                            ${changePercent !== 'N/A' ? ` (${changePercent})` : ''}
+                                        </div>
+                                    </div>
+                                    <button class="remove-btn" onclick="event.stopPropagation(); removeFavorite('${symbol}')">
+                                        Remove
+                                    </button>
+                                </div>
+                            `;
+                        });
+                        
+                        favoritesHTML += '</div>';
+                        favoritesList.innerHTML = favoritesHTML;
+                        
+                        console.log('Favorites loaded successfully, total:', result.data.length);
+                    }
+                } else {
+                    console.error('Failed to get favorites:', result);
+                    favoritesList.innerHTML = '<div class="empty-state">Failed to load watchlist</div>';
+                    showMessage('Failed to get favorites: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('An error occurred while loading favorites:', error);
+                document.getElementById('favoritesList').innerHTML = '<div class="empty-state">Failed to load, please refresh the page and try again.</div>';
+                showMessage('Failed to load favorites, please refresh the page and try again.', 'error');
+            }
+        }
+
+        function goToStockDetail(symbol) {
+            if (symbol && symbol !== 'N/A' && symbol !== 'Unknown') {
+                window.location.href = `/stock-detail.html?symbol=${symbol}`;
+            }
+        }
+
+        async function removeFavorite(symbol) {
+            if (!confirm(`Are you sure you want to remove ${symbol}?`)) {
+                return;
+            }
+
+            try {
+                console.log('Removing favorite:', symbol);
+                const response = await authenticatedFetch(`/api/v1/users/favorites/${symbol}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response) {
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('Remove favorite response:', result);
+                
+                if (result.success) {
+                    showMessage(`Removed ${symbol}`, 'success');
+                    await loadUserFavorites(); // Reload the watchlist
+                } else {
+                    showMessage('Removal failed: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('An error occurred while removing favorite:', error);
+                showMessage('Removal failed, please try again.', 'error');
+            }
+        }
+
+        function switchTab(tabName) {
+            console.log('Switching tab:', tabName);
+            
+            // Remove active status from all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add new active status
+            const tabs = ['basic', 'favorites', 'security'];
+            const tabIndex = tabs.indexOf(tabName);
+            if (tabIndex !== -1) {
+                document.querySelectorAll('.tab')[tabIndex].classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            }
+        }
+
+        // Profile update form submission
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Submitting profile update form');
+            
+            const updateBtn = document.getElementById('updateBtn');
+            const originalText = updateBtn.textContent;
+            updateBtn.textContent = 'Updating...';
+            updateBtn.disabled = true;
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = {
+                    email: formData.get('email')
+                };
+                
+                console.log('Update data:', data);
+                
+                const response = await authenticatedFetch('/api/v1/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response) {
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('Update response:', result);
+                
+                if (result.success) {
+                    showMessage('Profile updated successfully!', 'success');
+                    // Update displayed user info
+                    document.getElementById('userEmail').textContent = data.email || 'Email not set';
+                } else {
+                    showMessage('Update failed: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('An error occurred while updating profile:', error);
+                showMessage('Update failed, please try again.', 'error');
+            } finally {
+                updateBtn.textContent = originalText;
+                updateBtn.disabled = false;
+            }
+        });
+
+        // Change password form submission
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Submitting password change form');
+            
+            const passwordBtn = document.getElementById('passwordBtn');
+            const originalText = passwordBtn.textContent;
+            
+            const formData = new FormData(e.target);
+            const newPassword = formData.get('newPassword');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            // Validate password
+            if (newPassword !== confirmPassword) {
+                showMessage('New passwords do not match.', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showMessage('New password must be at least 6 characters long.', 'error');
+                return;
+            }
+            
+            passwordBtn.textContent = 'Changing...';
+            passwordBtn.disabled = true;
+            
+            try {
+                const data = {
+                    oldPassword: formData.get('oldPassword'),
+                    newPassword: newPassword
+                };
+                
+                console.log('Password change request...');
+                
+                // Note: This API endpoint may need to be implemented in the backend
+                const response = await authenticatedFetch('/api/v1/users/change-password', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response) {
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('Password change response:', result);
+                
+                if (result.success) {
+                    showMessage('Password changed successfully!', 'success');
+                    // Clear the form
+                    e.target.reset();
+                } else {
+                    showMessage('Password change failed: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('An error occurred while changing password:', error);
+                showMessage('Password change failed, please try again.', 'error');
+            } finally {
+                passwordBtn.textContent = originalText;
+                passwordBtn.disabled = false;
+            }
+        });
+
+        function showMessage(text, type = 'info') {
+            console.log(`Displaying message (${type}):`, text);
+            
+            const messageDiv = document.getElementById('message');
+            if (messageDiv) {
+                messageDiv.textContent = text;
+                messageDiv.className = `message ${type}`;
+                messageDiv.style.display = 'block';
+                
+                // Scroll to message position
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            } else {
+                // Fallback to alert if message element is not found
+                alert(text);
+            }
+        }
+
+        console.log('Profile page script loaded');
+    </script>
+</body>
+</html>
