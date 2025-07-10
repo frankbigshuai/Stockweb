@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .config import config  # 恢复这行
-# from .core.database import init_db
+from .core.database import init_db
 
 def create_app(config_name='development'):
     """应用工厂函数"""
@@ -21,7 +21,7 @@ def create_app(config_name='development'):
     CORS(app)
     
     # 仍然注释数据库和API
-    # init_db(app)
+    init_db(app)
     # from app.api import register_blueprints
     # register_blueprints(app)
     
