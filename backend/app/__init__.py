@@ -1,14 +1,12 @@
 from flask import Flask
 from flask_cors import CORS
-# 暂时注释可能有问题的导入
-# from .config import config
+from .config import config  # 恢复这行
 # from .core.database import init_db
 
 def create_app(config_name='development'):
     """应用工厂函数"""
     app = Flask(__name__)
     
-    # 简单的健康检查路由
     @app.route('/')
     def hello():
         return "Hello World! App is running!"
@@ -17,17 +15,13 @@ def create_app(config_name='development'):
     def health():
         return {"status": "ok", "message": "App is healthy"}
     
-    # 基本配置
-    app.config['SECRET_KEY'] = 'temp-secret-key'
+    # 恢复配置加载
+    app.config.from_object(config[config_name])  # 恢复这行
     
-    # 初始化 CORS
     CORS(app)
     
-    # 暂时注释掉可能阻塞的部分
-    # app.config.from_object(config[config_name])
-    # init_db(app)  # 数据库初始化可能阻塞
-    
-    # 注册蓝图
+    # 仍然注释数据库和API
+    # init_db(app)
     # from app.api import register_blueprints
     # register_blueprints(app)
     
