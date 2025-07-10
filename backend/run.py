@@ -1,5 +1,5 @@
 import os
-from app import create_app
+from backend.app import create_app
 
 # 获取配置名称，默认为development
 config_name = os.environ.get('FLASK_ENV', 'development')
