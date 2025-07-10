@@ -24,7 +24,7 @@ langchain-community==0.0.10
 openai>=1.6.1,<2.0.0
 
 # Vector Database
-faiss-cpu==1.7.4
+# faiss-cpu==1.7.4  # 暂时注释掉
 
 # Environment and Configuration
 python-dotenv==1.0.0
