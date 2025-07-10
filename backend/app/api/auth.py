@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 from datetime import datetime
-from app.models.user import User
-from app.core.auth import AuthManager, login_required
+from ..models.user import User      # 改为相对导入
+from ..core.auth import AuthManager, login_required    # 改为相对导入
 import os
 
 auth_bp = Blueprint('auth', __name__)

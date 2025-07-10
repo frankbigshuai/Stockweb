@@ -1,6 +1,6 @@
 # 🔧 修复1: stocks.py - 确保路由与前端调用匹配
 from flask import Blueprint, request, jsonify
-from app.models.stock import Stock
+from ..models.stock import Stock
 import traceback
 
 stocks_bp = Blueprint('stocks', __name__)

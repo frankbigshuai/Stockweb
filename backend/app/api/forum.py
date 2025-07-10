@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.models.forum import Post, Comment, Category
-from app.core.auth import login_required
+from ..models.forum import Post, Comment, Category    # 改为相对导入
+from ..core.auth import login_required    
 import os
 
 forum_bp = Blueprint('forum', __name__)

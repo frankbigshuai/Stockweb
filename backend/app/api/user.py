@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, send_from_directory
-from app.models.user import User
-from app.core.auth import login_required
+from ..models.user import User      # 改为相对导入
+from ..core.auth import login_required    # 改为相对导入
 import os
 
 user_bp = Blueprint('user', __name__)
