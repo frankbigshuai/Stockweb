@@ -306,7 +306,7 @@ def get_my_posts():
 def debug_database():
     """查看数据库状态（仅用于开发）"""
     try:
-        from app.core.database import mongo
+        from ..core.database import mongo  # ✅ 改为相对导入
         
         stats = {
             "users_count": mongo.db.users.count_documents({}),

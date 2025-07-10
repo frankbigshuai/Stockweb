@@ -9,7 +9,8 @@ class User:
     @staticmethod
     def _get_mongo():
         """获取mongo实例"""
-        from app.core.database import mongo
+        from ..core.database import mongo
+
         if mongo is None:
             raise RuntimeError("MongoDB connection not initialized")
         return mongo
@@ -195,7 +196,7 @@ class User:
         """获取用户的自选股详细信息"""
         try:
             mongo = User._get_mongo()  # 🔧 修复：添加这行
-            from app.models.stock import Stock
+            from .stock import Stock
             
             # 获取用户自选股，包含添加时间
             favorites_cursor = mongo.db.user_favorites.find({

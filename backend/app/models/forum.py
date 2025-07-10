@@ -1,7 +1,7 @@
 from bson import ObjectId
 from datetime import datetime
 from typing import Optional, List, Dict
-from app.core.database import mongo
+from ..core.database import mongo
 
 class Post:
     """论坛帖子模型"""

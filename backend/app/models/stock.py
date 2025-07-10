@@ -1,5 +1,5 @@
 from typing import Optional, Dict, List
-from app.services.stock_service import AlphaVantageService
+from ..services.stock_service import AlphaVantageService
 
 class Stock:
     """股票数据模型"""
