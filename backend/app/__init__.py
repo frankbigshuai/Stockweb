@@ -23,14 +23,13 @@ def create_app(config_name='development'):
     # 数据库初始化
     init_db(app)
     
-    # 恢复API蓝图注册
+    # 修复API蓝图导入路径
     try:
-        from app.api import register_blueprints
+        from .api import register_blueprints  # 改为相对导入
         register_blueprints(app)
         print("✅ API蓝图注册成功")
     except Exception as e:
         print(f"⚠️  API蓝图注册失败: {e}")
         print("应用将在基础模式下运行")
-        # 不抛出异常，让应用继续运行
     
     return app
