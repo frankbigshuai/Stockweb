@@ -7,7 +7,7 @@ import os
 auth_bp = Blueprint('auth', __name__)
 
 # 获取前端文件路径
-FRONTEND_PATH = '/Users/yuntianzeng/Desktop/Summerprojects/stockweb/frontend'
+FRONTEND_PATH = '/app/frontend'
 
 @auth_bp.route('/health')
 def health_check():

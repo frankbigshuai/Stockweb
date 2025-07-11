@@ -5,7 +5,7 @@ import os
 main_bp = Blueprint('main', __name__)
 
 # 设置前端路径
-FRONTEND_PATH = '/Users/yuntianzeng/Desktop/Summerprojects/stockweb/frontend'
+FRONTEND_PATH = '/app/frontend'
 
 @main_bp.route('/')
 def index():

@@ -6,7 +6,7 @@ import os
 user_bp = Blueprint('user', __name__)
 
 # 前端路径
-FRONTEND_PATH = '/Users/yuntianzeng/Desktop/Summerprojects/stockweb/frontend'
+FRONTEND_PATH = '/app/frontend'
 
 # HTML页面路由
 @user_bp.route('/profile.html')

@@ -4,7 +4,7 @@ import os
 static_bp = Blueprint('static', __name__)
 
 # 设置正确的前端路径
-FRONTEND_PATH = '/Users/yuntianzeng/Desktop/Summerprojects/stockweb/frontend'
+FRONTEND_PATH = '/app/frontend'
 
 @static_bp.route('/css/<path:filename>')
 def css_files(filename):
