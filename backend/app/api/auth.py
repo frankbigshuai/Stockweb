@@ -1,44 +1,44 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 from datetime import datetime
-from ..models.user import User      # 改为相对导入
-from ..core.auth import AuthManager, login_required    # 改为相对导入
+from ..models.user import User      # Relative import
+from ..core.auth import AuthManager, login_required    # Relative import
 import os
 
 auth_bp = Blueprint('auth', __name__)
 
-# 获取前端文件路径
+# Get frontend file path
 FRONTEND_PATH = '/app/frontend'
 
 @auth_bp.route('/health')
 def health_check():
-    """健康检查接口"""
+    """Health check endpoint"""
     return jsonify({
         "status": "healthy",
         "service": "Auth Service",
         "timestamp": datetime.utcnow().isoformat()
     })
 
-# ---------------------- 注册路由 ----------------------
+# ---------------------- Register Route ----------------------
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    """处理注册页面和注册请求"""
+    """Handles the registration page and registration requests"""
     if request.method == 'GET':
-        # 返回注册页面
+        # Return the registration page
         return send_from_directory(FRONTEND_PATH, 'register.html')
         
-    # POST请求 - 处理注册
+    # POST request - Handle registration
     data = request.get_json()
         
-    # 参数验证
+    # Parameter validation
     if not data:
-        return jsonify({"success": False, "error": "请求体不能为空"}), 400
+        return jsonify({"success": False, "error": "Request body cannot be empty"}), 400
         
     required_fields = ['username', 'password']
     for field in required_fields:
         if field not in data or not data[field]:
-            return jsonify({"success": False, "error": f"缺少必填字段: {field}"}), 400
+            return jsonify({"success": False, "error": f"Missing required field: {field}"}), 400
         
-    # 创建用户
+    # Create user
     user_id = User.create(
         username=data['username'],
         email=data.get('email', ''),
@@ -46,65 +46,65 @@ def register():
     )
         
     if not user_id:
-        return jsonify({"success": False, "error": "用户名或邮箱已存在"}), 400
+        return jsonify({"success": False, "error": "Username or email already exists"}), 400
             
     return jsonify({
         "success": True,
         "user_id": user_id,
-        "message": "注册成功"
+        "message": "Registration successful"
     }), 201
 
-# ---------------------- 登录路由 ----------------------
+# ---------------------- Login Route ----------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """处理登录页面和登录请求"""
+    """Handles the login page and login requests"""
     if request.method == 'GET':
-        # 返回登录页面
+        # Return the login page
         return send_from_directory(FRONTEND_PATH, 'login.html')
     
-    # POST请求 - 处理登录
+    # POST request - Handle login
     data = request.get_json()
     
     if not data or 'username' not in data or 'password' not in data:
-        return jsonify({"success": False, "error": "用户名和密码不能为空"}), 400
+        return jsonify({"success": False, "error": "Username and password cannot be empty"}), 400
     
-    # 验证登录
+    # Verify login
     user_id = User.verify_login(data['username'], data['password'])
     
     if user_id:
-        # 记录登录历史
+        # Record login history
         User.record_login(user_id, request.remote_addr)
         
-        # 生成JWT token
+        # Generate JWT token
         token = AuthManager.generate_token(user_id, data['username'])
         
         return jsonify({
             "success": True,
             "user_id": user_id,
             "username": data['username'],
-            "token": token,  # 返回token给前端
-            "message": "登录成功"
+            "token": token,  # Return token to frontend
+            "message": "Login successful"
         }), 200
     
     return jsonify({
         "success": False,
-        "error": "用户名或密码错误"
+        "error": "Invalid username or password"
     }), 401
 
-# ---------------------- 验证token路由 ----------------------
+# ---------------------- Verify Token Route ----------------------
 @auth_bp.route('/verify', methods=['POST'])
 def verify_token():
-    """验证token是否有效"""
+    """Verifies if the token is valid"""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-        return jsonify({'valid': False, 'error': '缺少token'}), 401
+        return jsonify({'valid': False, 'error': 'Token missing'}), 401
     
     try:
         token = auth_header.split(' ')[1]
         result = AuthManager.verify_token(token)
         
         if result['valid']:
-            # 获取最新的用户信息
+            # Get the latest user information
             profile = User.get_profile(result['user_id'])
             return jsonify({
                 'valid': True,
@@ -116,18 +116,17 @@ def verify_token():
     except Exception as e:
         return jsonify({'valid': False, 'error': str(e)}), 401
 
-# ---------------------- 登出路由 ----------------------
+# ---------------------- Logout Route ----------------------
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
-    """登出（主要是前端清除token）"""
+    """Logout (mainly for frontend to clear token)"""
     return jsonify({
         "success": True,
-        "message": "登出成功"
+        "message": "Logout successful"
     }), 200
 
 @auth_bp.route('/test')
 def test():
-    """测试路由"""
+    """Test route"""
     return jsonify({"message": "Test route is working"})
-
