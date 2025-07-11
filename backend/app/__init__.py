@@ -1,8 +1,13 @@
+from flask import Flask
+from flask_cors import CORS
+from .config import config
+from .core.database import init_db
+
 def create_app(config_name='development'):
     """应用工厂函数"""
     app = Flask(__name__)
     
-    # ❌ 删除或注释掉这些测试路由：
+    # 删除或注释掉测试路由（如果还存在的话）
     # @app.route('/')
     # def hello():
     #     return "Hello World! App is running!"
@@ -11,16 +16,21 @@ def create_app(config_name='development'):
     # def health():
     #     return {"status": "ok", "message": "App is healthy"}
     
-    # ✅ 保留其他配置
+    # 恢复配置加载
     app.config.from_object(config[config_name])
+    
     CORS(app)
+    
+    # 数据库初始化
     init_db(app)
     
+    # 恢复API蓝图注册
     try:
         from .api import register_blueprints
         register_blueprints(app)
         print("✅ API蓝图注册成功")
     except Exception as e:
         print(f"⚠️  API蓝图注册失败: {e}")
+        print("应用将在基础模式下运行")
     
     return app
