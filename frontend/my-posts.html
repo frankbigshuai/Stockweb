@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
     <title>My Posts - Investment Forum</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        /* 继承论坛页面的样式 */
+        /* Inherited styles from forum page */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -20,31 +21,31 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-bottom: 1px solid #d4edda;
         }
-        
+
         .navbar-left {
             display: flex;
             align-items: center;
             gap: 25px;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        
+
         .logo-icon {
             font-size: 18px;
             color: #28a745;
         }
-        
+
         .logo h2 {
             margin: 0;
             color: #2c5530;
             font-size: 16px;
             font-weight: 700;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 20px;
@@ -52,11 +53,11 @@
             margin: 0;
             padding: 0;
         }
-        
+
         .nav-links li {
             position: relative;
         }
-        
+
         .nav-links a {
             color: #495057;
             text-decoration: none;
@@ -68,38 +69,38 @@
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
-        
+
         .nav-links a:hover {
             color: #28a745;
             background: rgba(40, 167, 69, 0.1);
         }
-        
+
         .nav-links a.active {
             color: #28a745;
             background: rgba(40, 167, 69, 0.15);
         }
-        
+
         .navbar-right {
             display: flex;
             align-items: center;
             min-width: 200px;
             justify-content: flex-end;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
             white-space: nowrap;
         }
-        
+
         .user-info span {
             color: #495057;
             font-weight: 500;
             font-size: 12px;
             min-width: 80px;
         }
-        
+
         .user-info a, .user-info button {
             text-decoration: none;
             color: #495057;
@@ -112,12 +113,12 @@
             transition: all 0.3s ease;
             white-space: nowrap;
         }
-        
+
         .user-info a:hover, .user-info button:hover {
             background: rgba(40, 167, 69, 0.1);
             color: #28a745;
         }
-        
+
         .btn {
             padding: 6px 16px;
             border-radius: 4px;
@@ -133,23 +134,23 @@
             white-space: nowrap;
             min-width: 60px;
         }
-        
+
         .btn-primary {
             background: #28a745;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background: #218838;
             transform: translateY(-1px);
         }
-        
+
         .btn-outline {
             background: transparent;
             color: #dc3545;
             border: 1px solid #dc3545;
         }
-        
+
         .btn-outline:hover {
             background: #dc3545;
             color: white;
@@ -339,7 +340,7 @@
             color: #666;
         }
 
-        /* 编辑表单样式 */
+        /* Edit Form Styles */
         .edit-form {
             background: #f8f9fa;
             padding: 20px;
@@ -389,20 +390,20 @@
             .navbar {
                 padding: 8px 15px;
             }
-            
+
             .navbar-left {
                 gap: 15px;
             }
-            
+
             .nav-links {
                 display: none;
             }
-            
+
             .post-header {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .post-actions {
                 justify-content: center;
             }
@@ -410,7 +411,6 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-left">
             <div class="logo">
@@ -419,14 +419,14 @@
                     <h2>Investing</h2>
                 </a>
             </div>
-            
+
             <ul class="nav-links">
                 <li><a href="/stocks.html">Top Companies</a></li>
                 <li><a href="/compare.html">Comparison Board</a></li>
                 <li><a href="/api/v1/forum/forum.html">Forum</a></li>
             </ul>
         </div>
-        
+
         <div class="navbar-right">
             <div class="user-info" id="userInfo">
                 <span id="welcomeText">Welcome, username</span>
@@ -437,32 +437,27 @@
     </nav>
 
     <div class="container">
-        <!-- Back Button -->
         <div class="back-button">
             <a href="/api/v1/forum/forum.html" class="btn btn-secondary">← Back to Forum</a>
         </div>
 
-        <!-- Page Header -->
         <div class="page-header">
             <h1>📝 My Posts</h1>
             <p>Manage your forum posts - edit, delete, or create new ones</p>
         </div>
 
-        <!-- Posts Container -->
         <div class="posts-container" id="postsContainer">
             <div class="loading">Loading your posts...</div>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination" id="pagination"></div>
     </div>
-    <!-- Chatbox -->
     <div class="chatbox-container" id="chatboxContainer">
         <div class="chatbox-header">
             <h3>💬 Investment Assistant</h3>
             <button class="close-btn" onclick="toggleChatbox()">×</button>
         </div>
-        
+
         <div class="chatbox-messages" id="chatboxMessages">
             <div class="chatbox-message bot">
                 <div class="message-bubble">
@@ -470,7 +465,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="chatbox-input">
             <input type="text" id="chatInput" placeholder="Ask about stocks, markets, or investments..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()" id="sendButton">
@@ -510,15 +505,15 @@
                         limit: 10
                     });
 
-                    // 使用authManager获取认证头部
+                    // Use authManager to get authentication headers
                     const headers = authManager.getAuthHeaders();
-                    console.log('请求头部:', headers);
+                    console.log('Request Headers:', headers);
 
                     const response = await fetch(`/api/v1/forum/my-posts?${params}`, {
                         headers: headers
                     });
 
-                    console.log('响应状态:', response.status);
+                    console.log('Response Status:', response.status);
 
                     const result = await response.json();
 
@@ -526,23 +521,23 @@
                         this.renderPosts(result.data.posts);
                         this.renderPagination(result.data.pagination);
                     } else {
-                        postsContainer.innerHTML = `<div class="error-message">加载失败: ${result.error}</div>`;
+                        postsContainer.innerHTML = `<div class="error-message">Failed to load: ${result.error}</div>`;
                     }
                 } catch (error) {
                     console.error('Failed to load posts:', error);
-                    document.getElementById('postsContainer').innerHTML = '<div class="error-message">网络错误，请稍后重试</div>';
+                    document.getElementById('postsContainer').innerHTML = '<div class="error-message">Network error, please try again later.</div>';
                 }
             }
 
             renderPosts(posts) {
                 const postsContainer = document.getElementById('postsContainer');
-                
+
                 if (posts.length === 0) {
                     postsContainer.innerHTML = `
                         <div class="empty-state">
-                            <h3>还没有发布过帖子</h3>
-                            <p>去发布你的第一篇帖子吧！</p>
-                            <a href="/api/v1/forum/create-post.html" class="btn btn-primary">创建帖子</a>
+                            <h3>No posts published yet</h3>
+                            <p>Go publish your first post!</p>
+                            <a href="/api/v1/forum/create-post.html" class="btn btn-primary">Create Post</a>
                         </div>
                     `;
                     return;
@@ -551,26 +546,26 @@
                 const postsHTML = posts.map(post => this.createPostHTML(post)).join('');
                 postsContainer.innerHTML = postsHTML;
 
-                // 绑定事件
+                // Bind events
                 this.bindPostEvents();
             }
 
             createPostHTML(post) {
                 const categoryMap = {
-                    'general': '综合讨论',
-                    'stocks': '股票分析',
-                    'market': '市场观点',
-                    'strategy': '投资策略',
-                    'news': '财经新闻',
-                    'tech': '技术分析',
-                    'question': '新手提问'
+                    'general': 'General Discussion',
+                    'stocks': 'Stock Analysis',
+                    'market': 'Market View',
+                    'strategy': 'Investment Strategy',
+                    'news': 'Financial News',
+                    'tech': 'Technical Analysis',
+                    'question': 'Newbie Question'
                 };
 
                 const categoryName = categoryMap[post.category] || post.category;
                 const timeAgo = this.formatTimeAgo(post.created_at);
                 const updatedTimeAgo = this.formatTimeAgo(post.updated_at);
 
-                const tagsHTML = post.tags.map(tag => 
+                const tagsHTML = post.tags.map(tag =>
                     `<span class="post-tag">#${tag}</span>`
                 ).join('');
 
@@ -580,9 +575,9 @@
                             <div>
                                 <h3 class="post-title">${post.title}</h3>
                                 <div class="post-meta">
-                                    <span>创建于: ${timeAgo}</span>
+                                    <span>Created: ${timeAgo}</span>
                                     <span>•</span>
-                                    <span>更新于: ${updatedTimeAgo}</span>
+                                    <span>Updated: ${updatedTimeAgo}</span>
                                     <span class="post-category">${categoryName}</span>
                                 </div>
                             </div>
@@ -595,40 +590,39 @@
                             <span>👀 ${post.views}</span>
                         </div>
                         <div class="post-actions">
-                            <button class="btn btn-primary" onclick="myPostsManager.viewPost('${post.id}')">查看</button>
-                            <button class="btn btn-warning" onclick="myPostsManager.editPost('${post.id}')">编辑</button>
-                            <button class="btn btn-danger" onclick="myPostsManager.deletePost('${post.id}')">删除</button>
+                            <button class="btn btn-primary" onclick="myPostsManager.viewPost('${post.id}')">View</button>
+                            <button class="btn btn-warning" onclick="myPostsManager.editPost('${post.id}')">Edit</button>
+                            <button class="btn btn-danger" onclick="myPostsManager.deletePost('${post.id}')">Delete</button>
                         </div>
-                        
-                        <!-- 编辑表单 -->
+
                         <div class="edit-form" id="editForm-${post.id}">
                             <div class="form-group">
-                                <label for="editTitle-${post.id}">标题</label>
+                                <label for="editTitle-${post.id}">Title</label>
                                 <input type="text" id="editTitle-${post.id}" value="${post.title}">
                             </div>
                             <div class="form-group">
-                                <label for="editCategory-${post.id}">分类</label>
+                                <label for="editCategory-${post.id}">Category</label>
                                 <select id="editCategory-${post.id}">
-                                    <option value="general" ${post.category === 'general' ? 'selected' : ''}>综合讨论</option>
-                                    <option value="stocks" ${post.category === 'stocks' ? 'selected' : ''}>股票分析</option>
-                                    <option value="market" ${post.category === 'market' ? 'selected' : ''}>市场观点</option>
-                                    <option value="strategy" ${post.category === 'strategy' ? 'selected' : ''}>投资策略</option>
-                                    <option value="news" ${post.category === 'news' ? 'selected' : ''}>财经新闻</option>
-                                    <option value="tech" ${post.category === 'tech' ? 'selected' : ''}>技术分析</option>
-                                    <option value="question" ${post.category === 'question' ? 'selected' : ''}>新手提问</option>
+                                    <option value="general" ${post.category === 'general' ? 'selected' : ''}>General Discussion</option>
+                                    <option value="stocks" ${post.category === 'stocks' ? 'selected' : ''}>Stock Analysis</option>
+                                    <option value="market" ${post.category === 'market' ? 'selected' : ''}>Market View</option>
+                                    <option value="strategy" ${post.category === 'strategy' ? 'selected' : ''}>Investment Strategy</option>
+                                    <option value="news" ${post.category === 'news' ? 'selected' : ''}>Financial News</option>
+                                    <option value="tech" ${post.category === 'tech' ? 'selected' : ''}>Technical Analysis</option>
+                                    <option value="question" ${post.category === 'question' ? 'selected' : ''}>Newbie Question</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="editContent-${post.id}">内容</label>
+                                <label for="editContent-${post.id}">Content</label>
                                 <textarea id="editContent-${post.id}">${post.content}</textarea>
                             </div>
                             <div class="form-group">
-                                <label for="editTags-${post.id}">标签 (用逗号分隔)</label>
+                                <label for="editTags-${post.id}">Tags (comma-separated)</label>
                                 <input type="text" id="editTags-${post.id}" value="${post.tags.join(', ')}">
                             </div>
                             <div class="form-actions">
-                                <button class="btn btn-primary" onclick="myPostsManager.savePost('${post.id}')">保存</button>
-                                <button class="btn btn-secondary" onclick="myPostsManager.cancelEdit('${post.id}')">取消</button>
+                                <button class="btn btn-primary" onclick="myPostsManager.savePost('${post.id}')">Save</button>
+                                <button class="btn btn-secondary" onclick="myPostsManager.cancelEdit('${post.id}')">Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -662,11 +656,11 @@
                     const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
 
                     if (!title || !content) {
-                        alert('标题和内容不能为空');
+                        alert('Title and content cannot be empty');
                         return;
                     }
 
-                    // 使用authManager获取认证头部
+                    // Use authManager to get authentication headers
                     const headers = authManager.getAuthHeaders();
 
                     const response = await fetch(`/api/v1/forum/posts/${postId}`, {
@@ -683,28 +677,28 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        // 显示成功消息
-                        this.showMessage('帖子更新成功！', 'success');
-                        // 取消编辑模式
+                        // Show success message
+                        this.showMessage('Post updated successfully!', 'success');
+                        // Cancel edit mode
                         this.cancelEdit(postId);
-                        // 重新加载帖子列表
+                        // Reload post list
                         this.loadMyPosts();
                     } else {
-                        alert(`更新失败: ${result.error}`);
+                        alert(`Update failed: ${result.error}`);
                     }
                 } catch (error) {
                     console.error('Update failed:', error);
-                    alert('网络错误，请稍后重试');
+                    alert('Network error, please try again later');
                 }
             }
 
             async deletePost(postId) {
-                if (!confirm('确定要删除这篇帖子吗？此操作不能撤销。')) {
+                if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
                     return;
                 }
 
                 try {
-                    // 使用authManager获取认证头部
+                    // Use authManager to get authentication headers
                     const headers = authManager.getAuthHeaders();
 
                     const response = await fetch(`/api/v1/forum/posts/${postId}`, {
@@ -715,14 +709,14 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        this.showMessage('帖子删除成功！', 'success');
+                        this.showMessage('Post deleted successfully!', 'success');
                         this.loadMyPosts();
                     } else {
-                        alert(`删除失败: ${result.error}`);
+                        alert(`Delete failed: ${result.error}`);
                     }
                 } catch (error) {
                     console.error('Delete failed:', error);
-                    alert('网络错误，请稍后重试');
+                    alert('Network error, please try again later');
                 }
             }
 
@@ -730,10 +724,10 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `${type}-message`;
                 messageDiv.textContent = message;
-                
+
                 const container = document.querySelector('.container');
                 container.insertBefore(messageDiv, container.firstChild);
-                
+
                 setTimeout(() => {
                     messageDiv.remove();
                 }, 3000);
@@ -741,7 +735,7 @@
 
             renderPagination(pagination) {
                 const paginationDiv = document.getElementById('pagination');
-                
+
                 if (pagination.total_pages <= 1) {
                     paginationDiv.innerHTML = '';
                     return;
@@ -750,7 +744,7 @@
                 let paginationHTML = '';
 
                 if (pagination.has_prev) {
-                    paginationHTML += `<button onclick="myPostsManager.changePage(${pagination.current_page - 1})">上一页</button>`;
+                    paginationHTML += `<button onclick="myPostsManager.changePage(${pagination.current_page - 1})">Previous</button>`;
                 }
 
                 const startPage = Math.max(1, pagination.current_page - 2);
@@ -762,7 +756,7 @@
                 }
 
                 if (pagination.has_next) {
-                    paginationHTML += `<button onclick="myPostsManager.changePage(${pagination.current_page + 1})">下一页</button>`;
+                    paginationHTML += `<button onclick="myPostsManager.changePage(${pagination.current_page + 1})">Next</button>`;
                 }
 
                 paginationDiv.innerHTML = paginationHTML;
@@ -779,47 +773,47 @@
                 const now = new Date();
                 const diffInMinutes = Math.floor((now - date) / (1000 * 60));
 
-                if (diffInMinutes < 1) return '刚刚';
-                if (diffInMinutes < 60) return `${diffInMinutes} 分钟前`;
-                if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} 小时前`;
-                if (diffInMinutes < 43200) return `${Math.floor(diffInMinutes / 1440)} 天前`;
-                
-                return date.toLocaleDateString('zh-CN');
+                if (diffInMinutes < 1) return 'just now';
+                if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+                if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+                if (diffInMinutes < 43200) return `${Math.floor(diffInMinutes / 1440)} days ago`;
+
+                return date.toLocaleDateString('en-US');
             }
         }
 
-        // 初始化页面
+        // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('页面加载完成，检查认证状态');
-            
-            // 检查登录状态
+            console.log('Page loaded, checking authentication status');
+
+            // Check login status
             if (!authManager.isLoggedIn()) {
-                console.log('用户未登录，跳转到登录页');
-                alert('请先登录后再访问我的帖子');
+                console.log('User not logged in, redirecting to login page');
+                alert('Please log in first to view your posts');
                 window.location.href = '/api/v1/auth/login';
                 return;
             }
 
-            // 验证token是否有效
+            // Verify if token is valid
             const isValid = await authManager.verifyToken();
             if (!isValid) {
-                console.log('Token无效，跳转到登录页');
-                alert('登录已过期，请重新登录');
+                console.log('Invalid token, redirecting to login page');
+                alert('Login expired, please log in again');
                 window.location.href = '/api/v1/auth/login';
                 return;
             }
 
-            console.log('认证验证通过，用户信息:', authManager.user);
+            console.log('Authentication verified, user info:', authManager.user);
 
-            // 更新用户信息显示
+            // Update user info display
             if (authManager.user) {
                 const welcomeText = document.getElementById('welcomeText');
                 if (welcomeText) {
-                    welcomeText.textContent = `欢迎, ${authManager.user.username}`;
+                    welcomeText.textContent = `Welcome, ${authManager.user.username}`;
                 }
             }
 
-            // 初始化我的帖子管理器
+            // Initialize My Posts Manager
             window.myPostsManager = new MyPostsManager();
         });
     </script>

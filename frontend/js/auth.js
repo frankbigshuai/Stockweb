@@ -1,15 +1,15 @@
-// 完整的 auth.js - 修复所有逻辑问题 + RAG集成
-console.log('Auth.js 加载完成');
+// Complete auth.js - Fixed all logical issues + RAG integration
+console.log('Auth.js loaded');
 
 class AuthManager {
     constructor() {
         this.token = localStorage.getItem('auth_token');
         this.user = JSON.parse(localStorage.getItem('user_info') || 'null');
-        console.log('AuthManager初始化:', { token: !!this.token, user: this.user });
+        console.log('AuthManager initialized:', { token: !!this.token, user: this.user });
     }
 
     saveAuthInfo(token, user) {
-        console.log('保存认证信息:', { token: !!token, user });
+        console.log('Saving authentication information:', { token: !!token, user });
         this.token = token;
         this.user = user;
         localStorage.setItem('auth_token', token);
@@ -17,7 +17,7 @@ class AuthManager {
     }
 
     clearAuthInfo() {
-        console.log('清除认证信息');
+        console.log('Clearing authentication information');
         this.token = null;
         this.user = null;
         localStorage.removeItem('auth_token');
@@ -26,7 +26,7 @@ class AuthManager {
 
     isLoggedIn() {
         const loggedIn = !!this.token;
-        console.log('检查登录状态:', loggedIn);
+        console.log('Checking login status:', loggedIn);
         return loggedIn;
     }
 
@@ -40,25 +40,25 @@ class AuthManager {
 
     async verifyToken() {
         if (!this.token) {
-            console.log('没有token，验证失败');
+            console.log('No token, verification failed');
             return false;
         }
 
         try {
-            console.log('验证token...');
+            console.log('Verifying token...');
             const response = await fetch('/api/v1/auth/verify', {
                 method: 'POST',
                 headers: this.getAuthHeaders()
             });
 
             if (response.status === 401) {
-                console.log('Token无效，清除认证信息');
+                console.log('Invalid token, clearing authentication information');
                 this.clearAuthInfo();
                 return false;
             }
 
             const result = await response.json();
-            console.log('Token验证结果:', result);
+            console.log('Token verification result:', result);
 
             if (result.valid) {
                 if (result.user) {
@@ -67,25 +67,25 @@ class AuthManager {
                 }
                 return true;
             } else {
-                console.log('Token验证失败:', result.error);
+                console.log('Token verification failed:', result.error);
                 this.clearAuthInfo();
                 return false;
             }
         } catch (error) {
-            console.error('Token验证出错:', error);
+            console.error('Error verifying token:', error);
             return false;
         }
     }
 
     async logout() {
-        console.log('执行登出');
+        console.log('Performing logout');
         try {
             await fetch('/api/v1/auth/logout', {
                 method: 'POST',
                 headers: this.getAuthHeaders()
             });
         } catch (error) {
-            console.error('登出请求失败:', error);
+            console.error('Logout request failed:', error);
         } finally {
             this.clearAuthInfo();
             window.location.href = '/';
@@ -93,13 +93,13 @@ class AuthManager {
     }
 }
 
-// 创建全局实例
+// Create global instance
 const authManager = new AuthManager();
 
-// 认证请求辅助函数
+// Authenticated fetch helper function
 async function authenticatedFetch(url, options = {}) {
     if (!authManager.isLoggedIn()) {
-        alert('请先登录');
+        alert('Please log in first');
         window.location.href = '/api/v1/auth/login';
         return null;
     }
@@ -116,108 +116,108 @@ async function authenticatedFetch(url, options = {}) {
         });
 
         if (response.status === 401) {
-            console.log('Token已过期，清除登录信息');
+            console.log('Token expired, clearing login information');
             authManager.clearAuthInfo();
-            alert('登录已过期，请重新登录');
+            alert('Login expired, please log in again');
             window.location.href = '/api/v1/auth/login';
             return null;
         }
 
         return response;
     } catch (error) {
-        console.error('请求失败:', error);
+        console.error('Request failed:', error);
         throw error;
     }
 }
 
 // ===== UI UPDATE FUNCTIONS =====
 function updateUIForLoggedInUser() {
-    console.log('更新UI为登录状态');
-    
+    console.log('Updating UI for logged-in state');
+
     const authButtons = document.getElementById('authButtons');
     const userInfo = document.getElementById('userInfo');
     const welcomeText = document.getElementById('welcomeText');
-    
-    console.log('找到的元素:', { 
-        authButtons: !!authButtons, 
-        userInfo: !!userInfo, 
-        welcomeText: !!welcomeText 
+
+    console.log('Elements found:', {
+        authButtons: !!authButtons,
+        userInfo: !!userInfo,
+        welcomeText: !!welcomeText
     });
-    
+
     if (authButtons) {
         authButtons.style.display = 'none';
-        console.log('隐藏登录按钮');
+        console.log('Hiding login buttons');
     }
-    
+
     if (userInfo) {
         userInfo.style.display = 'flex';
-        console.log('显示用户信息');
+        console.log('Displaying user info');
     }
-    
+
     if (welcomeText && authManager.user) {
         welcomeText.textContent = `Welcome, ${authManager.user.username}`;
-        console.log('更新欢迎文字:', `Welcome, ${authManager.user.username}`);
+        console.log('Updating welcome text:', `Welcome, ${authManager.user.username}`);
     }
 }
 
 function updateUIForLoggedOutUser() {
-    console.log('更新UI为未登录状态');
-    
+    console.log('Updating UI for logged-out state');
+
     const authButtons = document.getElementById('authButtons');
     const userInfo = document.getElementById('userInfo');
-    
+
     if (authButtons) {
         authButtons.style.display = 'flex';
-        console.log('显示登录按钮');
+        console.log('Displaying login buttons');
     }
-    
+
     if (userInfo) {
         userInfo.style.display = 'none';
-        console.log('隐藏用户信息');
+        console.log('Hiding user info');
     }
 }
 
 // ===== FORM HANDLING =====
 function bindAuthForms() {
-    console.log('绑定表单事件');
-    
+    console.log('Binding form events');
+
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
-        console.log('绑定注册表单');
+        console.log('Binding registration form');
     }
 
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
-        console.log('绑定登录表单');
+        console.log('Binding login form');
     }
 }
 
 async function handleLogin(event) {
-    console.log('处理登录表单提交');
+    console.log('Handling login form submission');
     event.preventDefault();
-    
+
     const formData = new FormData(event.target);
     const data = {
         username: formData.get('username'),
         password: formData.get('password')
     };
-    
-    console.log('登录数据:', { username: data.username, password: '***' });
-    
+
+    console.log('Login data:', { username: data.username, password: '***' });
+
     if (!data.username || !data.password) {
-        showMessage('请输入用户名和密码', 'error');
+        showMessage('Please enter username and password', 'error');
         return;
     }
-    
+
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = '登录中...';
+    submitBtn.textContent = 'Logging in...';
     submitBtn.disabled = true;
-    
+
     try {
-        console.log('发送登录请求...');
+        console.log('Sending login request...');
         const response = await fetch('/api/v1/auth/login', {
             method: 'POST',
             headers: {
@@ -225,40 +225,40 @@ async function handleLogin(event) {
             },
             body: JSON.stringify(data)
         });
-        
-        console.log('登录响应状态:', response.status);
-        
+
+        console.log('Login response status:', response.status);
+
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
-            console.error('响应不是JSON格式:', text);
-            showMessage('服务器响应格式错误', 'error');
+            console.error('Response is not JSON format:', text);
+            showMessage('Server response format error', 'error');
             return;
         }
-        
+
         const result = await response.json();
-        console.log('登录响应数据:', result);
-        
+        console.log('Login response data:', result);
+
         if (result.success && result.token) {
-            console.log('登录成功，保存认证信息');
+            console.log('Login successful, saving authentication information');
             authManager.saveAuthInfo(result.token, {
                 user_id: result.user_id,
                 username: result.username
             });
-            
-            showMessage('登录成功！即将跳转...', 'success');
-            
+
+            showMessage('Login successful! Redirecting...', 'success');
+
             setTimeout(() => {
-                console.log('跳转到首页');
+                console.log('Redirecting to homepage');
                 window.location.href = '/';
             }, 1500);
         } else {
-            console.log('登录失败:', result.error);
-            showMessage('登录失败: ' + (result.error || '未知错误'), 'error');
+            console.log('Login failed:', result.error);
+            showMessage('Login failed: ' + (result.error || 'Unknown error'), 'error');
         }
     } catch (error) {
-        console.error('登录错误:', error);
-        showMessage('网络错误，请稍后重试', 'error');
+        console.error('Login error:', error);
+        showMessage('Network error, please try again later', 'error');
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -266,34 +266,34 @@ async function handleLogin(event) {
 }
 
 async function handleRegister(event) {
-    console.log('处理注册表单提交');
+    console.log('Handling registration form submission');
     event.preventDefault();
-    
+
     const formData = new FormData(event.target);
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
-    
+
     if (password !== confirmPassword) {
-        showMessage('两次输入的密码不一致', 'error');
+        showMessage('Passwords do not match', 'error');
         return;
     }
-    
+
     if (password.length < 6) {
-        showMessage('密码长度至少6位', 'error');
+        showMessage('Password must be at least 6 characters long', 'error');
         return;
     }
-    
+
     const data = {
         username: formData.get('username'),
         email: formData.get('email'),
         password: password
     };
-    
+
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = '注册中...';
+    submitBtn.textContent = 'Registering...';
     submitBtn.disabled = true;
-    
+
     try {
         const response = await fetch('/api/v1/auth/register', {
             method: 'POST',
@@ -302,20 +302,20 @@ async function handleRegister(event) {
             },
             body: JSON.stringify(data)
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
-            showMessage('注册成功！即将跳转到登录页面...', 'success');
+            showMessage('Registration successful! Redirecting to login page...', 'success');
             setTimeout(() => {
                 window.location.href = '/api/v1/auth/login';
             }, 1500);
         } else {
-            showMessage('注册失败: ' + result.error, 'error');
+            showMessage('Registration failed: ' + result.error, 'error');
         }
     } catch (error) {
-        console.error('注册错误:', error);
-        showMessage('网络错误，请稍后重试', 'error');
+        console.error('Registration error:', error);
+        showMessage('Network error, please try again later', 'error');
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -328,7 +328,7 @@ function showMessage(text, type = 'info') {
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
         messageDiv.style.display = 'block';
-        
+
         setTimeout(() => {
             messageDiv.style.display = 'none';
         }, 3000);
@@ -364,11 +364,11 @@ let chatboxOpen = false;
 function toggleChatbox() {
     const chatbox = document.getElementById('chatboxContainer');
     const toggle = document.getElementById('chatToggle');
-    
-    if (!chatbox || !toggle) return; // 如果页面没有聊天框，直接返回
-    
+
+    if (!chatbox || !toggle) return; // Return if chatbox elements are not present
+
     chatboxOpen = !chatboxOpen;
-    
+
     if (chatboxOpen) {
         chatbox.classList.add('active');
         toggle.style.display = 'none';
@@ -388,98 +388,98 @@ function handleKeyPress(event) {
     }
 }
 
-// ===== RAG CHATBOX INTEGRATION - 修复版本 =====
-// RAG服务器配置
+// ===== RAG CHATBOX INTEGRATION - Fixed Version =====
+// RAG server configuration
 const RAG_CONFIG = {
     baseUrl: 'http://127.0.0.1:5001',
     timeout: 30000,
     retryAttempts: 2
 };
 
-// 连接状态追踪
+// Connection status tracking
 let ragServerStatus = 'unknown'; // 'online', 'offline', 'unknown'
 
-// 检查RAG服务器状态
+// Check RAG server status
 async function checkRAGServerStatus() {
     try {
-        console.log('🔍 检查RAG服务器状态...');
-        
+        console.log('🔍 Checking RAG server status...');
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
+
         const response = await fetch(`${RAG_CONFIG.baseUrl}/health`, {
             method: 'GET',
             signal: controller.signal,
             mode: 'cors'
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         if (response.ok) {
             const data = await response.json();
-            console.log('✅ RAG服务器在线:', data);
+            console.log('✅ RAG server online:', data);
             ragServerStatus = 'online';
             return true;
         } else {
-            console.log('❌ RAG服务器响应异常:', response.status);
+            console.log('❌ RAG server responded abnormally:', response.status);
             ragServerStatus = 'offline';
             return false;
         }
     } catch (error) {
-        console.log('❌ RAG服务器连接失败:', error.message);
+        console.log('❌ RAG server connection failed:', error.message);
         ragServerStatus = 'offline';
         return false;
     }
 }
 
-// 带重试机制的fetch
+// Fetch with retry mechanism
 async function fetchWithRetry(url, options, retries = RAG_CONFIG.retryAttempts) {
     for (let i = 0; i < retries; i++) {
         try {
-            console.log(`🔄 请求尝试 ${i + 1}/${retries}: ${url}`);
-            
+            console.log(`🔄 Request attempt ${i + 1}/${retries}: ${url}`);
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), RAG_CONFIG.timeout);
-            
+
             const response = await fetch(url, {
                 ...options,
                 signal: controller.signal
             });
-            
+
             clearTimeout(timeoutId);
             return response;
-            
+
         } catch (error) {
-            console.log(`❌ 请求失败 ${i + 1}/${retries}:`, error.message);
-            
+            console.log(`❌ Request failed ${i + 1}/${retries}:`, error.message);
+
             if (i === retries - 1) {
-                throw error; // 最后一次尝试失败，抛出错误
+                throw error; // Throw error on last attempt failure
             }
-            
-            // 等待后重试
+
+            // Wait before retrying
             await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
         }
     }
 }
 
-// 修复的sendMessage函数
+// Fixed sendMessage function
 async function sendMessage() {
     const input = document.getElementById('chatInput');
     const message = input.value.trim();
-    
+
     if (!message) return;
-    
-    // 添加用户消息到界面
+
+    // Add user message to UI
     addMessage(message, 'user');
     input.value = '';
-    
-    // 显示打字指示器
+
+    // Show typing indicator
     showTypingIndicator();
-    
+
     try {
-        console.log('🤖 发送查询到RAG系统:', message);
-        
-        // 🔧 使用增强的fetch请求
+        console.log('🤖 Sending query to RAG system:', message);
+
+        // 🔧 Use enhanced fetch request
         const response = await fetchWithRetry(`${RAG_CONFIG.baseUrl}/bot`, {
             method: 'POST',
             headers: {
@@ -489,77 +489,77 @@ async function sendMessage() {
             body: JSON.stringify({query: message}),
             mode: 'cors'
         });
-        
-        console.log('📡 响应状态:', response.status);
-        
+
+        console.log('📡 Response status:', response.status);
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
-        // 检查响应类型
+
+        // Check response type
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
-            console.error('❌ 响应不是JSON格式:', text);
-            throw new Error('服务器响应格式错误');
+            console.error('❌ Response is not JSON format:', text);
+            throw new Error('Server response format error');
         }
-        
+
         const result = await response.json();
-        console.log('🤖 RAG响应:', result);
-        
+        console.log('🤖 RAG response:', result);
+
         hideTypingIndicator();
-        ragServerStatus = 'online'; // 更新状态
-        
+        ragServerStatus = 'online'; // Update status
+
         if (result.response) {
             addMessage(result.response, 'bot');
         } else if (result.error) {
-            addMessage(`抱歉，处理您的问题时出现错误：${result.error}`, 'bot');
+            addMessage(`Sorry, an error occurred while processing your question: ${result.error}`, 'bot');
         } else {
-            addMessage('抱歉，我现在无法回答您的问题。', 'bot');
+            addMessage('Sorry, I cannot answer your question at the moment.', 'bot');
         }
-        
+
     } catch (error) {
-        console.error('💥 聊天错误:', error);
+        console.error('💥 Chat error:', error);
         hideTypingIndicator();
-        ragServerStatus = 'offline'; // 更新状态
-        
-        let errorMessage = '🔌 无法连接到AI服务器。';
-        
+        ragServerStatus = 'offline'; // Update status
+
+        let errorMessage = '🔌 Could not connect to AI server.';
+
         if (error.name === 'AbortError') {
-            errorMessage += '\n⏱️ 请求超时，请稍后重试。';
-        } else if (error.message.includes('Failed to fetch') || 
+            errorMessage += '\n⏱️ Request timed out, please try again later.';
+        } else if (error.message.includes('Failed to fetch') ||
                    error.message.includes('ERR_CONNECTION_REFUSED')) {
-            errorMessage += '\n❌ 连接被拒绝。请确保：';
-            errorMessage += '\n• RAG服务器正在运行 (python api_server.py)';
-            errorMessage += '\n• 服务器地址：http://127.0.0.1:5001';
-            errorMessage += '\n• 检查防火墙设置';
+            errorMessage += '\n❌ Connection refused. Please ensure:';
+            errorMessage += '\n• The RAG server is running (python api_server.py)';
+            errorMessage += '\n• The server address is: http://127.0.0.1:5001';
+            errorMessage += '\n• Check firewall settings';
         } else if (error.message.includes('CORS')) {
-            errorMessage += '\n🚫 跨域请求被阻止。';
+            errorMessage += '\n🚫 Cross-Origin Request Blocked.';
         } else {
-            errorMessage += `\n🐛 错误：${error.message}`;
+            errorMessage += `\n🐛 Error: ${error.message}`;
         }
-        
+
         addMessage(errorMessage, 'bot');
-        
-        // 提供调试建议
+
+        // Provide debugging suggestions
         setTimeout(() => {
-            addMessage('💡 调试建议：\n1. 在浏览器中访问：http://127.0.0.1:5001/health\n2. 确认RAG服务器控制台显示"RAG API is running"\n3. 检查开发者工具的Network标签页', 'bot');
+            addMessage('💡 Debugging tips:\n1. Visit: http://127.0.0.1:5001/health in your browser\n2. Confirm the RAG server console shows "RAG API is running"\n3. Check the Network tab in developer tools', 'bot');
         }, 1000);
     }
 }
 
-// 改进的消息显示函数
+// Improved message display function
 function addMessage(message, sender) {
     const messagesContainer = document.getElementById('chatboxMessages');
     if (!messagesContainer) return;
-    
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `chatbox-message ${sender}`;
-    
+
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    
-    // 处理多行文本和换行
+
+    // Handle multi-line text and line breaks
     if (message.includes('\n')) {
         const lines = message.split('\n');
         lines.forEach((line, index) => {
@@ -571,25 +571,25 @@ function addMessage(message, sender) {
     } else {
         bubble.textContent = message;
     }
-    
+
     messageDiv.appendChild(bubble);
     messagesContainer.appendChild(messageDiv);
-    
-    // 滚动到底部
+
+    // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 function showTypingIndicator() {
     const messagesContainer = document.getElementById('chatboxMessages');
     if (!messagesContainer) return;
-    
-    // 移除现有的指示器
+
+    // Remove existing indicator
     hideTypingIndicator();
-    
+
     const typingDiv = document.createElement('div');
     typingDiv.className = 'typing-indicator';
     typingDiv.id = 'typingIndicator';
-    
+
     typingDiv.innerHTML = `
         <span>AI is thinking</span>
         <div class="typing-dots">
@@ -598,7 +598,7 @@ function showTypingIndicator() {
             <div></div>
         </div>
     `;
-    
+
     messagesContainer.appendChild(typingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
@@ -610,40 +610,40 @@ function hideTypingIndicator() {
     }
 }
 
-// 调试函数
+// Debugging functions
 function testRAGConnection() {
-    console.log('🧪 测试RAG连接...');
+    console.log('🧪 Testing RAG connection...');
     checkRAGServerStatus().then(isOnline => {
         if (isOnline) {
-            addMessage('✅ RAG服务器连接测试成功！', 'bot');
+            addMessage('✅ RAG server connection test successful!', 'bot');
         } else {
-            addMessage('❌ RAG服务器连接测试失败', 'bot');
+            addMessage('❌ RAG server connection test failed', 'bot');
         }
     });
 }
 
-// 暴露给全局作用域用于调试
+// Expose to global scope for debugging
 window.testRAGConnection = testRAGConnection;
 window.checkRAGServerStatus = checkRAGServerStatus;
 
 // ===== MAIN INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('页面DOMContentLoaded事件触发');
-    
-    // 检查是否在需要认证的页面
+    console.log('Page DOMContentLoaded event triggered');
+
+    // Check if the page requires authentication
     const requireAuth = document.body.dataset.requireAuth === 'true';
-    console.log('页面是否需要认证:', requireAuth);
-    
+    console.log('Page requires authentication:', requireAuth);
+
     if (requireAuth && !authManager.isLoggedIn()) {
-        console.log('页面需要认证但用户未登录');
-        alert('请先登录');
+        console.log('Page requires authentication but user is not logged in');
+        alert('Please log in first');
         window.location.href = '/api/v1/auth/login';
         return;
     }
-    
-    // 登录状态检查和UI更新
+
+    // Login status check and UI update
     if (authManager.isLoggedIn()) {
-        console.log('用户已登录，验证token...');
+        console.log('User is logged in, verifying token...');
         const isValid = await authManager.verifyToken();
         if (isValid) {
             updateUIForLoggedInUser();
@@ -651,23 +651,23 @@ document.addEventListener('DOMContentLoaded', async function() {
             updateUIForLoggedOutUser();
         }
     } else {
-        console.log('用户未登录');
+        console.log('User is not logged in');
         updateUIForLoggedOutUser();
     }
 
-    // 绑定表单事件
+    // Bind form events
     bindAuthForms();
 
-    // 初始化聊天框（如果存在）
+    // Initialize chatbox (if present)
     const chatboxContainer = document.getElementById('chatboxContainer');
     if (chatboxContainer) {
-        console.log('🚀 初始化聊天框...');
-        
-        // 初始化聊天框（如果存在）
+        console.log('🚀 Initializing chatbox...');
+
+        // Initialize chatbox (if present)
         setTimeout(async () => {
             const isOnline = await checkRAGServerStatus();
             if (isOnline) {
-                // 只显示一次欢迎消息，不重复
+                // Only show welcome message once, not repeatedly
                 const existingMessages = document.querySelectorAll('.chatbox-message');
                 if (existingMessages.length === 0) {
                     addMessage('👋 Hi! I\'m your investment assistant. I can help you analyze company information, stock data, and more. How can I assist you today?', 'bot');
@@ -678,19 +678,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         }, 1000);
     }
 
-    // 聊天框外部点击关闭事件
+    // Close chatbox on outside click
     document.addEventListener('click', function(event) {
         const chatbox = document.getElementById('chatboxContainer');
         const toggle = document.getElementById('chatToggle');
-        
-        if (chatbox && toggle && chatboxOpen && 
-            !chatbox.contains(event.target) && 
+
+        if (chatbox && toggle && chatboxOpen &&
+            !chatbox.contains(event.target) &&
             !toggle.contains(event.target)) {
             toggleChatbox();
         }
     });
 
-    // 防止点击聊天框内部时关闭
+    // Prevent closing when clicking inside chatbox
     if (chatboxContainer) {
         chatboxContainer.addEventListener('click', function(event) {
             event.stopPropagation();

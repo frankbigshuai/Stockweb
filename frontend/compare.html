@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        /* 全局样式 */
+        /* Global Styles */
         * {
             margin: 0;
             padding: 0;
@@ -428,7 +428,7 @@
             text-align: center;
         }
 
-        /* 消息提示样式 */
+        /* Message Styles */
         .message {
             margin-top: 15px;
             padding: 10px;
@@ -454,7 +454,7 @@
             color: #0c5460;
         }
 
-        /* 聊天框样式 */
+        /* Chatbox Styles */
         .chatbox-container {
             position: fixed;
             bottom: 20px;
@@ -779,7 +779,7 @@
                 🔍 Start Comparison
             </button>
             
-            <!-- 消息提示区域 -->
+            <!-- Message display area -->
             <div id="message" class="message"></div>
         </div>
 
@@ -787,7 +787,7 @@
         <div class="comparison-results" id="comparisonResults">
             <!-- Stock Cards -->
             <div class="comparison-grid" id="stockCards">
-                <!-- 动态生成的股票卡片会在这里显示 -->
+                <!-- Dynamically generated stock cards will appear here -->
             </div>
 
             <!-- Financial Metrics Comparison Table -->
@@ -804,7 +804,7 @@
                         </tr>
                     </thead>
                     <tbody id="metricsTableBody">
-                        <!-- 动态生成的指标行会在这里显示 -->
+                        <!-- Dynamically generated metric rows will appear here -->
                     </tbody>
                 </table>
             </div>
@@ -848,26 +848,26 @@
         </svg>
     </button>
     
-    <!-- 首先引入auth.js -->
+    <!-- First include auth.js -->
     <script src="/js/auth.js"></script>
     
-    <!-- 然后定义股票比较功能 -->
+    <!-- Then define stock comparison functionality -->
     <script>
-        console.log('🚀 加载股票比较页面脚本');
+        console.log('🚀 Loading stock comparison page script');
 
         class StockComparison {
             constructor() {
                 this.selectedStocks = [];
                 this.searchTimeout = null;
                 this.priceChart = null;
-                console.log('📊 StockComparison 类初始化完成');
+                console.log('📊 StockComparison class initialized');
                 this.initializeEventListeners();
             }
 
             initializeEventListeners() {
-                console.log('🔗 初始化事件监听器');
+                console.log('🔗 Initializing event listeners');
                 
-                // 搜索输入事件
+                // Search input events
                 document.querySelectorAll('.stock-input input').forEach(input => {
                     input.addEventListener('input', (e) => {
                         this.handleSearchInput(e);
@@ -880,16 +880,16 @@
                     });
                 });
 
-                // 比较按钮事件 - 使用事件监听器而不是onclick
+                // Compare button event - using event listener instead of onclick
                 const compareButton = document.getElementById('compareButton');
                 if (compareButton) {
                     compareButton.addEventListener('click', () => {
-                        console.log('🔍 点击比较按钮');
+                        console.log('🔍 Compare button clicked');
                         this.compareStocks();
                     });
-                    console.log('✅ 比较按钮事件绑定成功');
+                    console.log('✅ Compare button event bound successfully');
                 } else {
-                    console.error('❌ 找不到比较按钮');
+                    console.error('❌ Could not find compare button');
                 }
             }
 
@@ -913,7 +913,7 @@
 
             async searchStocks(query, inputElement) {
                 try {
-                    console.log(`🔍 搜索股票: ${query}`);
+                    console.log(`🔍 Searching stocks: ${query}`);
                     const response = await fetch(`/api/v1/stocks/search?q=${encodeURIComponent(query)}`);
                     
                     if (!response.ok) {
@@ -921,18 +921,18 @@
                     }
                     
                     const result = await response.json();
-                    console.log('搜索API响应:', result);
+                    console.log('Search API response:', result);
 
                     if (result.success && result.data && result.data.length > 0) {
                         this.showSearchResults(result.data, inputElement);
                     } else {
                         this.hideSearchResults(inputElement);
-                        console.log('没有找到搜索结果');
+                        console.log('No search results found');
                     }
                 } catch (error) {
-                    console.error('搜索API失败:', error);
+                    console.error('Search API failed:', error);
                     this.hideSearchResults(inputElement);
-                    this.showMessage('搜索失败，请检查网络连接', 'error');
+                    this.showMessage('Search failed, please check your network connection', 'error');
                 }
             }
 
@@ -940,7 +940,7 @@
                 const resultsContainer = inputElement.parentElement.querySelector('.search-results');
                 
                 if (!resultsContainer) {
-                    console.error('找不到搜索结果容器');
+                    console.error('Could not find search results container');
                     return;
                 }
 
@@ -970,12 +970,12 @@
                 if (input) {
                     input.value = symbol;
                     this.hideSearchResults(input);
-                    console.log(`选择股票: ${symbol} - ${name}`);
+                    console.log(`Selected stock: ${symbol} - ${name}`);
                 }
             }
 
             async compareStocks() {
-                console.log('🚀 开始股票比较');
+                console.log('🚀 Starting stock comparison');
                 const inputs = document.querySelectorAll('.stock-input input');
                 const symbols = [];
                 
@@ -987,16 +987,16 @@
                 });
 
                 if (symbols.length < 2) {
-                    this.showMessage('请至少选择2只股票进行比较', 'error');
+                    this.showMessage('Please select at least 2 stocks to compare', 'error');
                     return;
                 }
 
                 if (symbols.length > 4) {
-                    this.showMessage('最多可以比较4只股票', 'error');
+                    this.showMessage('Maximum 4 stocks can be compared', 'error');
                     return;
                 }
 
-                console.log('开始股票比较:', symbols);
+                console.log('Starting stock comparison:', symbols);
                 this.showLoading();
 
                 try {
@@ -1004,25 +1004,25 @@
                         symbols.map(symbol => this.getStockDetail(symbol))
                     );
 
-                    console.log('获取的股票数据:', stocksData);
+                    console.log('Retrieved stock data:', stocksData);
 
                     const validStocks = stocksData.filter(stock => stock !== null);
 
-                    console.log('有效的股票数据:', validStocks);
+                    console.log('Valid stock data:', validStocks);
 
                     if (validStocks.length < 2) {
-                        this.showMessage('获取股票数据失败，请检查股票代码是否正确', 'error');
+                        this.showMessage('Failed to retrieve stock data, please check if the symbols are correct', 'error');
                         return;
                     }
 
                     this.selectedStocks = validStocks;
-                    console.log('准备显示比较结果，股票数量:', this.selectedStocks.length);
+                    console.log('Preparing to display comparison results, number of stocks:', this.selectedStocks.length);
                     this.displayComparison();
-                    this.showMessage(`成功比较了 ${validStocks.length} 只股票`, 'success');
+                    this.showMessage(`Successfully compared ${validStocks.length} stocks`, 'success');
 
                 } catch (error) {
-                    console.error('比较失败:', error);
-                    this.showMessage('比较失败，请稍后重试', 'error');
+                    console.error('Comparison failed:', error);
+                    this.showMessage('Comparison failed, please try again later', 'error');
                 } finally {
                     this.hideLoading();
                 }
@@ -1030,7 +1030,7 @@
 
             async getStockDetail(symbol) {
                 try {
-                    console.log(`获取股票详情: ${symbol}`);
+                    console.log(`Fetching stock details: ${symbol}`);
                     const response = await fetch(`/api/v1/stocks/detail/${symbol}`);
                     
                     if (!response.ok) {
@@ -1038,62 +1038,62 @@
                     }
                     
                     const result = await response.json();
-                    console.log(`${symbol} API响应:`, result);
+                    console.log(`${symbol} API response:`, result);
 
                     if (result.success && result.data) {
-                        console.log(`${symbol} 数据:`, result.data);
+                        console.log(`${symbol} data:`, result.data);
                         return result.data;
                     } else {
-                        console.error(`获取 ${symbol} 失败:`, result.error || '无数据');
+                        console.error(`Failed to fetch ${symbol}:`, result.error || 'No data');
                         return null;
                     }
                 } catch (error) {
-                    console.error(`获取 ${symbol} 失败:`, error);
+                    console.error(`Failed to fetch ${symbol}:`, error);
                     return null;
                 }
             }
 
             displayComparison() {
-                console.log('=== 开始显示对比结果 ===');
-                console.log('选中的股票数据:', this.selectedStocks);
+                console.log('=== Starting to display comparison results ===');
+                console.log('Selected stock data:', this.selectedStocks);
                 
                 this.hideLoading();
                 
                 const comparisonResults = document.getElementById('comparisonResults');
-                console.log('comparisonResults元素:', comparisonResults);
+                console.log('comparisonResults element:', comparisonResults);
                 
                 if (comparisonResults) {
                     comparisonResults.style.display = 'block';
-                    console.log('✅ 显示了comparison results容器');
+                    console.log('✅ Showed comparison results container');
                 } else {
-                    console.error('❌ comparisonResults容器不存在');
+                    console.error('❌ comparisonResults container does not exist');
                     return;
                 }
                 
-                console.log('=== 开始渲染过程 ===');
+                console.log('=== Starting rendering process ===');
                 
                 try {
-                    console.log('🎯 开始渲染股票卡片...');
+                    console.log('🎯 Starting to render stock cards...');
                     this.renderStockCards();
-                    console.log('✅ 股票卡片渲染完成');
+                    console.log('✅ Stock cards rendered successfully');
                 } catch (error) {
-                    console.error('❌ 股票卡片渲染失败:', error);
+                    console.error('❌ Failed to render stock cards:', error);
                 }
                 
                 try {
-                    console.log('🎯 开始渲染指标表格...');
+                    console.log('🎯 Starting to render metrics table...');
                     this.renderMetricsTable();
-                    console.log('✅ 指标表格渲染完成');
+                    console.log('✅ Metrics table rendered successfully');
                 } catch (error) {
-                    console.error('❌ 指标表格渲染失败:', error);
+                    console.error('❌ Failed to render metrics table:', error);
                 }
                 
                 try {
-                    console.log('🎯 开始渲染价格图表...');
+                    console.log('🎯 Starting to render price chart...');
                     this.renderPriceChart();
-                    console.log('✅ 价格图表渲染完成');
+                    console.log('✅ Price chart rendered successfully');
                 } catch (error) {
-                    console.error('❌ 价格图表渲染失败:', error);
+                    console.error('❌ Failed to render price chart:', error);
                 }
                 
                 setTimeout(() => {
@@ -1104,24 +1104,24 @@
             }
 
             renderStockCards() {
-                console.log('开始渲染股票卡片');
+                console.log('Starting to render stock cards');
                 let container = document.getElementById('stockCards');
                 
                 if (!container) {
-                    console.error('无法找到股票卡片容器');
+                    console.error('Could not find stock cards container');
                     return;
                 }
 
-                console.log('找到容器，开始渲染股票卡片, 股票数量:', this.selectedStocks.length);
+                console.log('Found container, starting to render stock cards, number of stocks:', this.selectedStocks.length);
                 
                 if (!this.selectedStocks || this.selectedStocks.length === 0) {
-                    console.error('没有选中的股票数据');
-                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">没有股票数据</div>';
+                    console.error('No selected stock data');
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No stock data</div>';
                     return;
                 }
                 
                 const cardsHtml = this.selectedStocks.map((stock, index) => {
-                    console.log(`渲染第 ${index + 1} 只股票:`, stock);
+                    console.log(`Rendering stock ${index + 1}:`, stock);
                     
                     const price = stock.price || stock.current_price || 0;
                     const change = stock.change || stock.price_change || 0;
@@ -1147,37 +1147,37 @@
                     `;
                 }).join('');
                 
-                console.log('生成的HTML长度:', cardsHtml.length);
+                console.log('Generated HTML length:', cardsHtml.length);
                 container.innerHTML = cardsHtml;
-                console.log('股票卡片渲染完成');
+                console.log('Stock cards rendered successfully');
                 
                 const renderedCards = container.querySelectorAll('.stock-card');
-                console.log('实际渲染的卡片数量:', renderedCards.length);
+                console.log('Actual number of rendered cards:', renderedCards.length);
             }
 
             renderMetricsTable() {
-                console.log('开始渲染指标表格');
+                console.log('Starting to render metrics table');
                 
-                // 更新表格列标题
+                // Update table column headers
                 this.selectedStocks.forEach((stock, index) => {
                     const col = document.getElementById(`col${index + 1}`);
                     if (col) {
                         col.textContent = stock.symbol;
                         col.style.display = 'table-cell';
-                        console.log(`设置列${index + 1}标题为: ${stock.symbol}`);
+                        console.log(`Set column ${index + 1} header to: ${stock.symbol}`);
                     }
                 });
 
-                // 隐藏多余的列
+                // Hide extra columns
                 for (let i = this.selectedStocks.length; i < 4; i++) {
                     const col = document.getElementById(`col${i + 1}`);
                     if (col) {
                         col.style.display = 'none';
-                        console.log(`隐藏列${i + 1}`);
+                        console.log(`Hiding column ${i + 1}`);
                     }
                 }
 
-                // 定义指标
+                // Define metrics
                 const metrics = [
                     { label: 'Current Price', key: 'price', format: 'currency' },
                     { label: 'Change %', key: 'change_percent', format: 'percentage' },
@@ -1194,7 +1194,7 @@
                 let tbody = document.getElementById('metricsTableBody');
                 
                 if (!tbody) {
-                    console.error('无法找到指标表格tbody');
+                    console.error('Could not find metrics table tbody');
                     return;
                 }
 
@@ -1209,7 +1209,7 @@
                 `).join('');
 
                 tbody.innerHTML = rowsHtml;
-                console.log('指标表格渲染完成，行数:', metrics.length);
+                console.log('Metrics table rendered successfully, number of rows:', metrics.length);
             }
 
             formatMetricValue(value, format) {
@@ -1259,7 +1259,7 @@
 
                 const ctx = document.getElementById('priceChart');
                 if (!ctx) {
-                    console.error('找不到价格图表canvas');
+                    console.error('Could not find price chart canvas');
                     return;
                 }
 
@@ -1268,7 +1268,7 @@
                 const labels = [];
                 const datasets = [];
                 
-                // 生成30天的日期标签
+                // Generate 30-day date labels
                 for (let i = 29; i >= 0; i--) {
                     const date = new Date();
                     date.setDate(date.getDate() - i);
@@ -1277,7 +1277,7 @@
 
                 const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
                 
-                // 为每只股票生成模拟价格数据
+                // Generate simulated price data for each stock
                 this.selectedStocks.forEach((stock, index) => {
                     const basePrice = parseFloat(stock.price || 100);
                     const data = [];
@@ -1341,7 +1341,7 @@
                 if (container) {
                     container.style.display = 'block';
                     container.innerHTML = `
-                        <div class="loading">🔄 加载股票数据中...</div>
+                        <div class="loading">🔄 Loading stock data...</div>
                         
                         <div class="comparison-grid" id="stockCards">
                         </div>
@@ -1400,17 +1400,17 @@
             }
         }
 
-        // 全局变量声明
+        // Global variable declaration
         let stockComparison = null;
 
-        // 页面加载完成后初始化
+        // Initialize after page loads
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('📄 compare.html DOMContentLoaded 事件触发');
+            console.log('📄 compare.html DOMContentLoaded event triggered');
             
-            // 等待 auth.js 完全加载
+            // Wait for auth.js to fully load
             if (typeof authManager === 'undefined') {
-                console.log('⏳ 等待 authManager 加载...');
-                // 简单的等待机制
+                console.log('⏳ Waiting for authManager to load...');
+                // Simple waiting mechanism
                 let attempts = 0;
                 const waitForAuth = setInterval(() => {
                     attempts++;
@@ -1425,14 +1425,14 @@
         });
 
         async function initializePage() {
-            console.log('🚀 开始初始化compare页面');
+            console.log('🚀 Starting compare page initialization');
             
-            // 初始化认证状态 (这部分由auth.js处理)
+            // Initialize authentication status (handled by auth.js)
             if (typeof authManager !== 'undefined') {
-                console.log('✅ AuthManager 可用');
+                console.log('✅ AuthManager available');
                 
                 if (authManager.isLoggedIn()) {
-                    console.log('用户已登录，验证token...');
+                    console.log('User is logged in, verifying token...');
                     const isValid = await authManager.verifyToken();
                     if (isValid) {
                         updateUIForLoggedInUser();
@@ -1440,38 +1440,38 @@
                         updateUIForLoggedOutUser();
                     }
                 } else {
-                    console.log('用户未登录');
+                    console.log('User is not logged in');
                     updateUIForLoggedOutUser();
                 }
             } else {
-                console.warn('⚠️ AuthManager 未加载，跳过认证初始化');
+                console.warn('⚠️ AuthManager not loaded, skipping auth initialization');
             }
             
-            // 初始化股票比较功能
-            console.log('📊 初始化股票比较功能');
+            // Initialize stock comparison functionality
+            console.log('📊 Initializing stock comparison functionality');
             stockComparison = new StockComparison();
             
-            // 将stockComparison暴露到全局作用域，供HTML调用
+            // Expose stockComparison to global scope for HTML calls
             window.stockComparison = stockComparison;
             
-            console.log('✅ compare.html 初始化完成');
+            console.log('✅ compare.html initialization complete');
         }
 
-        // 全局函数，供HTML调用（备用方案）
+        // Global function for HTML calls (fallback)
         function compareStocks() {
-            console.log('🔍 全局compareStocks函数被调用');
+            console.log('🔍 Global compareStocks function called');
             if (window.stockComparison) {
                 window.stockComparison.compareStocks();
             } else {
-                console.error('❌ stockComparison 未初始化');
-                alert('股票比较功能未初始化，请刷新页面');
+                console.error('❌ stockComparison not initialized');
+                alert('Stock comparison not initialized, please refresh the page');
             }
         }
 
-        // 暴露到全局作用域
+        // Expose to global scope
         window.compareStocks = compareStocks;
         
-        console.log('📄 compare.html 脚本加载完成');
+        console.log('📄 compare.html script loaded');
     </script>
         
 </body>
