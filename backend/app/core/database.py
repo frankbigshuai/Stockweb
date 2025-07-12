@@ -6,21 +6,37 @@ mongo = PyMongo()
 def init_db(app):
     """初始化数据库连接"""
     try:
-        # 🔧 修改这行：MONGODB_URI → MONGO_URL
+        # 检查环境变量
         mongodb_uri = os.environ.get('MONGO_URL')
         if not mongodb_uri:
-            print("⚠️  警告: MONGO_URL 环境变量未设置")  # 🔧 修改这行
+            print("⚠️  警告: MONGO_URL 环境变量未设置")
             print("应用将在无数据库模式下运行")
             return mongo
         
+        # 🔧 添加调试信息
+        print(f"📊 MongoDB URI 前30字符: {mongodb_uri[:30]}...")
+        print(f"📊 URI 总长度: {len(mongodb_uri)}")
+        
         # 设置连接字符串
         app.config['MONGO_URI'] = mongodb_uri
-        mongo.init_app(app)
         
-        # 测试连接（设置短超时）
+        # 🔧 添加调试信息
+        print("📊 开始初始化 PyMongo...")
+        mongo.init_app(app)
+        print("📊 PyMongo 初始化完成")
+        
+        # 测试连接
         with app.app_context():
-            # 设置较短的超时时间
-            mongo.db.command('ping', maxTimeMS=5000)  # 5秒超时
+            # 🔧 检查 mongo.db 是否存在
+            print(f"📊 mongo.db 状态: {type(mongo.db)}")
+            if mongo.db is None:
+                print("❌ mongo.db 是 None！PyMongo 初始化可能失败")
+                return mongo
+            
+            # 🔧 尝试更简单的连接测试
+            print("📊 尝试连接测试...")
+            result = mongo.db.command('ping', maxTimeMS=10000)  # 增加到10秒
+            print(f"📊 Ping 结果: {result}")
             print("✅ MongoDB连接成功")
             
             # 创建索引
@@ -28,15 +44,24 @@ def init_db(app):
             
     except Exception as e:
         print(f"⚠️  MongoDB连接失败: {e}")
+        print(f"📊 错误类型: {type(e)}")
+        
+        # 🔧 打印完整错误信息
+        import traceback
+        print(f"📊 完整错误: {traceback.format_exc()}")
+        
         print("应用将在无数据库模式下继续运行")
-        # 不要抛出异常，让应用继续启动
-        # raise e  ← 注释掉这行！
     
     return mongo
 
 def create_indexes():
     """创建数据库索引"""
     try:
+        # 检查 mongo.db 
+        if mongo.db is None:
+            print("⚠️  跳过索引创建：mongo.db 是 None")
+            return
+            
         # 用户集合索引
         mongo.db.users.create_index([("username", 1)], unique=True)
         mongo.db.users.create_index([("email", 1)], unique=True)
@@ -67,4 +92,3 @@ def create_indexes():
         
     except Exception as e:
         print(f"⚠️  索引创建警告: {e}")
-        # 索引可能已经存在或数据库不可用，不抛出异常
