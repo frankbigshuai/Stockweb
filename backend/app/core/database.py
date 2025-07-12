@@ -6,10 +6,10 @@ mongo = PyMongo()
 def init_db(app):
     """初始化数据库连接"""
     try:
-        # 检查环境变量
-        mongodb_uri = os.environ.get('MONGODB_URI')
+        # 🔧 修改这行：MONGODB_URI → MONGO_URL
+        mongodb_uri = os.environ.get('MONGO_URL')
         if not mongodb_uri:
-            print("⚠️  警告: MONGODB_URI 环境变量未设置")
+            print("⚠️  警告: MONGO_URL 环境变量未设置")  # 🔧 修改这行
             print("应用将在无数据库模式下运行")
             return mongo
         
