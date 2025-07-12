@@ -8,7 +8,10 @@ load_dotenv()
 class Config:
     """基础配置"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    MONGO_URI = os.environ.get('MONGO_URI') or 'mongodb://localhost:27017/stock_app'
+    
+    # 🔧 修改这行：MONGO_URI → MONGODB_URI
+    MONGO_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/stock_app'
+    
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-key'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
     
@@ -30,6 +33,8 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     """测试环境配置"""
     TESTING = True
+    
+    # 🔧 修改这行也要改
     MONGO_URI = 'mongodb://localhost:27017/stock_app_test'
 
 config = {
