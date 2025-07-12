@@ -13,55 +13,59 @@ def init_db(app):
             print("应用将在无数据库模式下运行")
             return mongo
         
-        # 🔧 添加调试信息
         print(f"📊 MongoDB URI 前30字符: {mongodb_uri[:30]}...")
         print(f"📊 URI 总长度: {len(mongodb_uri)}")
         
-        # 设置连接字符串
+        # 🔧 修改配置方式
         app.config['MONGO_URI'] = mongodb_uri
         
-        # 🔧 添加调试信息
+        # 🔧 添加这些配置来解决连接问题
+        app.config['MONGO_CONNECT'] = False
+        app.config['MONGO_AUTO_START_REQUEST'] = False
+        
         print("📊 开始初始化 PyMongo...")
         mongo.init_app(app)
         print("📊 PyMongo 初始化完成")
         
-        # 测试连接
-        with app.app_context():
-            # 🔧 检查 mongo.db 是否存在
-            print(f"📊 mongo.db 状态: {type(mongo.db)}")
-            if mongo.db is None:
-                print("❌ mongo.db 是 None！PyMongo 初始化可能失败")
-                return mongo
-            
-            # 🔧 尝试更简单的连接测试
+        # 🔧 修改测试连接的方式
+        try:
+            # 直接在这里测试，不用应用上下文
             print("📊 尝试连接测试...")
-            result = mongo.db.command('ping', maxTimeMS=10000)  # 增加到10秒
-            print(f"📊 Ping 结果: {result}")
-            print("✅ MongoDB连接成功")
             
-            # 创建索引
-            create_indexes()
+            # 🔧 延迟导入并测试
+            from pymongo import MongoClient
+            client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=5000)
+            
+            # 测试连接
+            client.admin.command('ping')
+            print("✅ MongoDB连接测试成功")
+            client.close()
+            
+            # 创建索引（延迟到实际使用时）
+            print("📊 MongoDB连接配置完成，索引将在首次使用时创建")
+            
+        except Exception as conn_error:
+            print(f"⚠️  MongoDB连接测试失败: {conn_error}")
+            print("应用将在无数据库模式下继续运行")
             
     except Exception as e:
-        print(f"⚠️  MongoDB连接失败: {e}")
+        print(f"⚠️  MongoDB初始化失败: {e}")
         print(f"📊 错误类型: {type(e)}")
-        
-        # 🔧 打印完整错误信息
         import traceback
         print(f"📊 完整错误: {traceback.format_exc()}")
-        
         print("应用将在无数据库模式下继续运行")
     
     return mongo
 
 def create_indexes():
-    """创建数据库索引"""
+    """创建数据库索引 - 延迟执行"""
     try:
-        # 检查 mongo.db 
         if mongo.db is None:
-            print("⚠️  跳过索引创建：mongo.db 是 None")
+            print("⚠️  跳过索引创建：数据库未连接")
             return
             
+        print("📊 开始创建数据库索引...")
+        
         # 用户集合索引
         mongo.db.users.create_index([("username", 1)], unique=True)
         mongo.db.users.create_index([("email", 1)], unique=True)
@@ -91,4 +95,4 @@ def create_indexes():
         print("✅ 数据库索引创建成功")
         
     except Exception as e:
-        print(f"⚠️  索引创建警告: {e}")
+        print(f"⚠️  索引创建失败: {e}")
