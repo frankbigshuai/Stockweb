@@ -389,9 +389,14 @@ function handleKeyPress(event) {
 }
 
 // ===== RAG CHATBOX INTEGRATION - Fixed Version =====
-// RAG server configuration
+// RAG server configuration - 🔧 FIXED: 更新为Railway部署地址
 const RAG_CONFIG = {
-    baseUrl: 'http://127.0.0.1:5001',
+    // ❌ 旧配置（本地开发）
+    // baseUrl: 'http://127.0.0.1:5001',
+    
+    // ✅ 新配置（Railway部署）
+    baseUrl: 'https://stockweb-ai-production.up.railway.app',
+    
     timeout: 30000,
     retryAttempts: 2
 };
@@ -479,7 +484,7 @@ async function sendMessage() {
     try {
         console.log('🤖 Sending query to RAG system:', message);
 
-        // 🔧 Use enhanced fetch request
+        // 🔧 Use enhanced fetch request with correct Railway endpoint
         const response = await fetchWithRetry(`${RAG_CONFIG.baseUrl}/bot`, {
             method: 'POST',
             headers: {
@@ -530,9 +535,9 @@ async function sendMessage() {
         } else if (error.message.includes('Failed to fetch') ||
                    error.message.includes('ERR_CONNECTION_REFUSED')) {
             errorMessage += '\n❌ Connection refused. Please ensure:';
-            errorMessage += '\n• The RAG server is running (python api_server.py)';
-            errorMessage += '\n• The server address is: http://127.0.0.1:5001';
-            errorMessage += '\n• Check firewall settings';
+            errorMessage += '\n• The stockai Railway app is running';
+            errorMessage += '\n• The server address is: https://stockweb-ai-production.up.railway.app';
+            errorMessage += '\n• Check CORS settings';
         } else if (error.message.includes('CORS')) {
             errorMessage += '\n🚫 Cross-Origin Request Blocked.';
         } else {
@@ -543,7 +548,7 @@ async function sendMessage() {
 
         // Provide debugging suggestions
         setTimeout(() => {
-            addMessage('💡 Debugging tips:\n1. Visit: http://127.0.0.1:5001/health in your browser\n2. Confirm the RAG server console shows "RAG API is running"\n3. Check the Network tab in developer tools', 'bot');
+            addMessage('💡 Debugging tips:\n1. Visit: https://stockweb-ai-production.up.railway.app/health in your browser\n2. Confirm the stockai Railway app is running\n3. Check the Network tab in developer tools\n4. Verify CORS configuration', 'bot');
         }, 1000);
     }
 }

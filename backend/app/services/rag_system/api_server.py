@@ -9,7 +9,13 @@ app = Flask(__name__)
 
 # 🔧 更新CORS配置以支持Railway部署
 CORS(app, 
-     origins=["https://stockweb-production.up.railway.app", "http://127.0.0.1:5000", "http://localhost:5000", "*"],
+     origins=[
+         "https://stockweb-production.up.railway.app",  # 你的stockweb域名
+         "https://stockweb-ai-production.up.railway.app",  # 你的stockai域名（自己访问自己）
+         "http://127.0.0.1:5000", 
+         "http://localhost:5000",
+         "*"  # 在开发阶段可以用*，生产环境建议移除
+     ],
      allow_headers=["Content-Type", "Authorization", "Accept"],
      methods=["GET", "POST", "OPTIONS"],
      supports_credentials=True)
