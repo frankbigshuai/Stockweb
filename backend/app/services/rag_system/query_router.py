@@ -1,3 +1,4 @@
+# query_router.py - Enhanced version with AlphaVantage news integration
 from langchain_openai import ChatOpenAI
 from company_info_query_engine import run_general_query
 from pandas_data_analyzer import run_analytical_query
@@ -5,9 +6,18 @@ from config_utils import load_openai_key
 import logging
 import time
 
-# Set up logging
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Import news handler
+try:
+    from news_handler import handle_news_query
+    NEWS_HANDLER_AVAILABLE = True
+    logger.info("✅ News handler imported successfully")
+except ImportError as e:
+    NEWS_HANDLER_AVAILABLE = False
+    logger.warning(f"⚠️ News handler not available: {e}")
 
 # Lightweight classification model
 llm = ChatOpenAI(
@@ -19,10 +29,10 @@ llm = ChatOpenAI(
 )
 
 def classify_question(query):
-    """Intelligently classifies the question"""
+    """Enhanced question classification with news handling"""
     query_lower = query.lower()
     
-    # Explicit analytical keywords
+    # Clear analytical keywords
     analytical_keywords = [
         'price', 'stock price', 'share price', 'cost',
         'earnings', 'revenue', 'profit', 'sales',
@@ -35,7 +45,7 @@ def classify_question(query):
         'show me data', 'latest data', 'current data'
     ]
     
-    # Explicit general keywords
+    # Clear general keywords
     general_keywords = [
         'what does', 'tell me about', 'who is', 'describe',
         'business model', 'business', 'company',
@@ -46,52 +56,128 @@ def classify_question(query):
         'what is', 'explain', 'how does', 'why does'
     ]
     
-    # Calculate match scores
+    # 🆕 News keywords - special handling
+    news_keywords = [
+        'news', 'latest news', 'recent news', 'current news',
+        'updates', 'announcements', 'recent developments',
+        'breaking news', 'headlines', 'press release',
+        'today news', 'this week', 'recent articles'
+    ]
+    
+    # Check for news queries first
+    news_score = sum(1 for keyword in news_keywords if keyword in query_lower)
+    if news_score > 0:
+        logger.info("📰 Classification: news (special handling)")
+        return "news"
+    
+    # Calculate matching scores for other categories
     analytical_score = sum(1 for keyword in analytical_keywords if keyword in query_lower)
     general_score = sum(1 for keyword in general_keywords if keyword in query_lower)
     
     logger.info(f"Keyword matching - Analytical: {analytical_score}, General: {general_score}")
     
-    # Special rule: words related to specific numbers bias towards analytical
+    # Special rules: queries with specific numeric words lean toward analytical
     if any(word in query_lower for word in ['$', 'dollar', 'million', 'billion', '%', 'percent']):
         analytical_score += 2
     
     # Decision logic
     if analytical_score > general_score:
-        logger.info("📊 Classification: analytical (via keywords)")
+        logger.info("📊 Classification: analytical (by keywords)")
         return "analytical"
     elif general_score > analytical_score:
-        logger.info("📋 Classification: general (via keywords)")
+        logger.info("📋 Classification: general (by keywords)")
         return "general"
     
     # If scores are equal, use LLM
     try:
-        prompt = f"""Classify this question as "analytical" or "general":
+        prompt = f"""Classify this question as "analytical", "general", or "news":
 
 Question: "{query}"
 
 Rules:
 - analytical: asks for specific data, prices, financial information, statistical analysis
-- general: asks for company introductions, business models, products/services, industry information
+- general: asks for company introduction, business model, products/services, industry information  
+- news: asks for recent news, updates, current events, latest developments
 
-Answer with only one word:"""
+Answer with one word only:"""
         
         response = llm.invoke(prompt)
         classification = response.content.strip().lower()
         
         if "analytical" in classification:
-            logger.info("📊 Classification: analytical (via LLM)")
+            logger.info("📊 Classification: analytical (by LLM)")
             return "analytical"
+        elif "news" in classification:
+            logger.info("📰 Classification: news (by LLM)")
+            return "news"
         else:
-            logger.info("📋 Classification: general (via LLM)")
+            logger.info("📋 Classification: general (by LLM)")
             return "general"
             
     except Exception as e:
         logger.warning(f"❌ LLM classification failed: {e}, defaulting to general")
         return "general"
 
+def handle_news_query_with_fallback(query):
+    """Handle news queries with AlphaVantage API or fallback"""
+    try:
+        if NEWS_HANDLER_AVAILABLE:
+            # Use real-time news API
+            logger.info("📰 Using AlphaVantage news API")
+            return handle_news_query(query)
+        else:
+            # Fallback to disclaimer
+            logger.info("📰 Using news fallback (API not available)")
+            return handle_news_fallback(query)
+    except Exception as e:
+        logger.error(f"❌ News handling failed: {e}")
+        return handle_news_fallback(query)
+
+def handle_news_fallback(query):
+    """Fallback news handler when API is not available"""
+    # Extract company name if possible
+    company_keywords = {
+        'apple': 'Apple Inc.',
+        'microsoft': 'Microsoft',
+        'google': 'Google/Alphabet',
+        'amazon': 'Amazon',
+        'tesla': 'Tesla',
+        'meta': 'Meta',
+        'nvidia': 'NVIDIA'
+    }
+    
+    company_mentioned = None
+    for keyword, company_name in company_keywords.items():
+        if keyword in query.lower():
+            company_mentioned = company_name
+            break
+    
+    if company_mentioned:
+        return f"""⚠️ **Real-time news currently unavailable**
+
+I'm unable to access current news for {company_mentioned} at the moment due to API configuration.
+
+📰 **For the latest {company_mentioned} news, please check:**
+• Official {company_mentioned} website and investor relations
+• Financial news: Bloomberg, Reuters, CNBC, Yahoo Finance
+• SEC filings (for publicly traded companies)
+• Company's official social media accounts
+
+💡 **Tip**: Search for "{company_mentioned} news" on Google News for the most recent updates.
+
+🔧 **Technical Note**: To enable real-time news, configure ALPHA_VANTAGE_API_KEY in environment variables."""
+    else:
+        return """📰 **News Query Detected**
+
+Please specify which company you'd like news about. For example:
+• "Apple news"
+• "Tesla recent news"
+• "Microsoft latest updates"
+
+🔧 **Note**: Real-time news requires Alpha Vantage API configuration."""
+
 def route_query(query):
-    """Main query routing function"""
+    """Enhanced query routing with news handling"""
     start_time = time.time()
     
     try:
@@ -102,46 +188,30 @@ def route_query(query):
         query = query.strip()
         logger.info(f"🎯 Processing query: {query}")
         
-        # Classify the question
+        # Classify question
         question_type = classify_question(query)
         logger.info(f"🔀 Routing to: {question_type}")
         
-        # Route to the appropriate handler
+        # Route to appropriate handler
         if question_type == "analytical":
             try:
-                logger.info("📊 Calling data analysis engine...")
+                logger.info("📊 Calling analytical engine...")
                 response = run_analytical_query(query)
                 
-                # Check analytical response quality
                 if response and len(response.strip()) > 10:
-                    # If the response looks like an error message or a fallback, also try general query
-                    if any(phrase in response.lower() for phrase in 
-                          ['sorry', 'unable to', 'cannot', 'not available', 'no data found']):
-                        logger.info("🔄 Analytical response seems problematic, trying general query as supplement")
-                        try:
-                            general_response = run_general_query(query)
-                            if general_response and len(general_response.strip()) > 10:
-                                return f"Based on my data analysis: {response}\n\nSupplementary information: {general_response}"
-                        except:
-                            pass
-                    
                     return response
                 else:
-                    logger.warning("⚠️ Analytical response is empty or too short, trying general query")
+                    logger.warning("⚠️ Analytical response empty, trying general query")
                     return run_general_query(query)
                 
             except Exception as analytical_error:
                 logger.error(f"❌ Analytical query failed: {analytical_error}")
-                
-                # Try general query as a fallback
-                try:
-                    logger.info("🔄 Trying general query as fallback")
-                    general_response = run_general_query(query)
-                    return f"Data analysis is temporarily unavailable, answering based on my knowledge:\n\n{general_response}"
-                except:
-                    return "Sorry, I am currently unable to process your query. Please try again later or ask a different question."
-        else:
-            # General query
+                return run_general_query(query)
+        
+        elif question_type == "news":
+            return handle_news_query_with_fallback(query)
+        
+        else:  # general
             try:
                 logger.info("📋 Calling general query engine...")
                 return run_general_query(query)
@@ -152,33 +222,29 @@ def route_query(query):
     except Exception as e:
         logger.error(f"❌ Routing error: {str(e)}")
         execution_time = time.time() - start_time
-        return f"Sorry, a system error occurred while processing your question (Time taken: {execution_time:.1f} seconds). Please try again later."
+        return f"Sorry, an error occurred while processing your question (execution time: {execution_time:.1f}s). Please try again later."
 
-def test_routing():
-    """Tests the routing functionality"""
+# Test function
+if __name__ == "__main__":
+    print("🧪 Testing Enhanced Query Router...")
+    print("=" * 50)
+    
+    # Test news handling
     test_queries = [
-        ("What is Apple's stock price?", "analytical"),
-        ("Tell me about Microsoft", "general"),
-        ("Calculate average revenue", "analytical"),
-        ("What does Google do?", "general"),
-        ("Show me earnings data", "analytical"),
-        ("Who are Tesla's competitors?", "general")
+        "Apple news",
+        "Latest Tesla news", 
+        "What is Apple's stock price?",
+        "Tell me about Microsoft",
+        "Recent Microsoft developments"
     ]
     
-    print("🧪 Testing query routing...")
-    
-    for query, expected in test_queries:
-        try:
-            print(f"\n🔍 Testing: '{query}'")
-            predicted = classify_question(query)
-            result = route_query(query)
-            
-            status = "✅" if predicted == expected else "⚠️"
-            print(f"{status} Classification: {predicted} (Expected: {expected})")
-            print(f"📝 Response: {result[:100]}...")
-            
-        except Exception as e:
-            print(f"❌ Test failed: {query} - {e}")
-
-if __name__ == "__main__":
-    test_routing()
+    for query in test_queries:
+        print(f"\n🔍 Testing: '{query}'")
+        classification = classify_question(query)
+        print(f"📋 Classification: {classification}")
+        
+        result = route_query(query)
+        print(f"📝 Response: {result[:200]}...")
+        
+    print(f"\n{'='*50}")
+    print("🎉 Testing completed!")
