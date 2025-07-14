@@ -1,4 +1,4 @@
-# api_server.py - Railway部署版本
+# api_server.py - Railway Deployment Version
 from query_router import route_query
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -7,14 +7,14 @@ import os
 
 app = Flask(__name__)
 
-# 🔧 更新CORS配置以支持Railway部署
+# 🔧 Update CORS configuration to support Railway deployment
 CORS(app, 
      origins=[
-         "https://stockweb-production.up.railway.app",  # 你的stockweb域名
-         "https://stockweb-ai-production.up.railway.app",  # 你的stockai域名（自己访问自己）
+         "https://stockweb-production.up.railway.app",  # Your stockweb domain
+         "https://stockweb-ai-production.up.railway.app",  # Your stockai domain (self-access)
          "http://127.0.0.1:5000", 
          "http://localhost:5000",
-         "*"  # 在开发阶段可以用*，生产环境建议移除
+         "*"  # Use * during development, recommended to remove in production
      ],
      allow_headers=["Content-Type", "Authorization", "Accept"],
      methods=["GET", "POST", "OPTIONS"],
@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO)
 
 @app.route('/bot', methods=['POST', 'OPTIONS'])
 def ask():
-    """主要的查询端点"""
+    """Main query endpoint"""
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'OK'})
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -33,18 +33,18 @@ def ask():
         return response
     
     origin = request.headers.get('Origin', 'Unknown')
-    logging.info(f"收到来自 {origin} 的请求")
+    logging.info(f"Received request from {origin}")
     
     data = request.json
     if not data:
-        return jsonify({'error': 'JSON数据是必需的'}), 400
+        return jsonify({'error': 'JSON data is required'}), 400
     
     query = data.get('query', '')
     if not query:
-        return jsonify({'error': 'Query字段是必需的'}), 400
+        return jsonify({'error': 'Query field is required'}), 400
     
     try:
-        logging.info(f"处理查询: {query}")
+        logging.info(f"Processing query: {query}")
         response = route_query(query)
         
         result = jsonify({
@@ -57,7 +57,7 @@ def ask():
         return result
         
     except Exception as e:
-        logging.error(f"查询处理错误: {str(e)}")
+        logging.error(f"Query processing error: {str(e)}")
         error_response = jsonify({
             'error': str(e),
             'status': 'error'
@@ -67,10 +67,10 @@ def ask():
 
 @app.route('/health', methods=['GET'])
 def health():
-    """健康检查端点"""
+    """Health check endpoint"""
     response = jsonify({
         'status': 'healthy', 
-        'message': 'RAG API服务器正在运行',
+        'message': 'RAG API server is running',
         'endpoints': {
             'main': '/bot',
             'health': '/health',
@@ -82,12 +82,12 @@ def health():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    """测试端点"""
+    """Test endpoint"""
     response_data = {
-        'message': '测试成功!',
+        'message': 'Test successful!',
         'method': request.method,
         'origin': request.headers.get('Origin', 'No origin'),
-        'timestamp': 'Railway部署版本'
+        'timestamp': 'Railway Deployment Version'
     }
     
     response = jsonify(response_data)
@@ -96,24 +96,24 @@ def test():
 
 @app.errorhandler(404)
 def not_found(error):
-    response = jsonify({'error': '端点未找到', 'available_endpoints': ['/bot', '/health', '/test']})
+    response = jsonify({'error': 'Endpoint not found', 'available_endpoints': ['/bot', '/health', '/test']})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response, 404
 
 @app.errorhandler(500)
 def internal_error(error):
-    response = jsonify({'error': '服务器内部错误', 'message': str(error)})
+    response = jsonify({'error': 'Internal server error', 'message': str(error)})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response, 500
 
 if __name__ == '__main__':
-    print("🚀 启动RAG API服务器...")
-    print("📊 RAG系统已就绪!")
-    print("🌐 API地址: /bot")
-    print("🏥 健康检查: /health")
-    print("🧪 测试端点: /test")
+    print("🚀 Starting RAG API server...")
+    print("📊 RAG system ready!")
+    print("🌐 API address: /bot")
+    print("🏥 Health check: /health")
+    print("🧪 Test endpoint: /test")
     print("=" * 50)
     
-    # Railway部署配置
+    # Railway deployment configuration
     port = int(os.environ.get('PORT', 5001))
     app.run(debug=False, host="0.0.0.0", port=port, threaded=True)

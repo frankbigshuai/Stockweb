@@ -1,14 +1,13 @@
-# pandas_data_analyzer.py - 直接查询版本（替换原文件）
 import pandas as pd
 import numpy as np
 import logging
 
-# 设置日志
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DataQueryEngine:
-    """直接数据查询引擎 - 绕过pandas agent"""
+    """Direct Data Query Engine - Bypasses pandas agent"""
     
     def __init__(self, stock_data, news_data, earnings_data, cashflow_data):
         self.stock_data = stock_data
@@ -16,7 +15,7 @@ class DataQueryEngine:
         self.earnings_data = earnings_data
         self.cashflow_data = cashflow_data
         
-        # 标准化列名映射
+        # Standardized column name mapping
         self.stock_cols = {
             'symbol': 'symbol',
             'date': 'date', 
@@ -27,21 +26,21 @@ class DataQueryEngine:
             'volume': '5. volume'
         }
         
-        # 预处理数据
+        # Preprocess data
         self._preprocess_data()
     
     def _preprocess_data(self):
-        """预处理数据"""
+        """Preprocesses the data"""
         try:
-            # 标准化股票代码为大写
+            # Standardize stock symbols to uppercase
             if 'symbol' in self.stock_data.columns:
                 self.stock_data['symbol'] = self.stock_data['symbol'].str.upper()
             
-            # 转换日期格式
+            # Convert date format
             if 'date' in self.stock_data.columns:
                 self.stock_data['date'] = pd.to_datetime(self.stock_data['date'])
             
-            # 获取可用股票列表
+            # Get list of available stock symbols
             self.available_symbols = self.stock_data['symbol'].unique() if 'symbol' in self.stock_data.columns else []
             
             logger.info(f"Preprocessing completed: {len(self.available_symbols)} stock symbols")
@@ -50,51 +49,51 @@ class DataQueryEngine:
             logger.warning(f"Data preprocessing failed: {e}")
     
     def query(self, question):
-        """主查询入口"""
+        """Main query entry point"""
         question_lower = question.lower()
         
-        # 1. 股价查询
+        # 1. Stock price query
         if any(word in question_lower for word in ['price', 'stock price', 'share price']):
             return self._handle_price_query(question_lower)
         
-        # 2. 收益查询
+        # 2. Earnings query
         elif any(word in question_lower for word in ['earnings', 'revenue', 'profit']):
             return self._handle_earnings_query(question_lower)
         
-        # 3. 现金流查询
+        # 3. Cash flow query
         elif any(word in question_lower for word in ['cash flow', 'cashflow']):
             return self._handle_cashflow_query(question_lower)
         
-        # 4. 新闻情绪查询
+        # 4. News sentiment query
         elif any(word in question_lower for word in ['sentiment', 'news']):
             return self._handle_sentiment_query(question_lower)
         
-        # 5. 统计查询
+        # 5. Statistical query
         elif any(word in question_lower for word in ['average', 'mean', 'median', 'max', 'min', 'highest', 'lowest']):
             return self._handle_stats_query(question_lower)
         
-        # 6. 比较查询
+        # 6. Comparison query
         elif any(word in question_lower for word in ['compare', 'vs', 'versus', 'between']):
             return self._handle_comparison_query(question_lower)
         
-        # 7. 排名查询
+        # 7. Ranking query
         elif any(word in question_lower for word in ['top', 'best', 'worst', 'rank', 'ranking']):
             return self._handle_ranking_query(question_lower)
         
-        # 8. 数据信息查询
+        # 8. Data information query
         elif any(word in question_lower for word in ['companies', 'symbols', 'available', 'list', 'data summary']):
             return self._handle_info_query(question_lower)
         
-        # 9. 默认回退
+        # 9. Default fallback
         else:
             return self._handle_fallback_query(question)
     
     def _handle_price_query(self, question):
-        """处理股价查询 - 增强版"""
+        """Handles stock price queries - enhanced version"""
         try:
             close_col = self.stock_cols['close']
             
-            # 特定公司股价 - 提供更详细信息
+            # Specific company price - provide more detailed information
             company = self._extract_company(question)
             if company:
                 company_data = self.stock_data[self.stock_data['symbol'] == company.upper()]
@@ -102,7 +101,7 @@ class DataQueryEngine:
                     latest_price = company_data.iloc[-1][close_col]
                     latest_date = company_data.iloc[-1]['date'] if 'date' in company_data.columns else 'recent'
                     
-                    # 计算额外统计信息
+                    # Calculate additional statistics
                     high_col = self.stock_cols['high']
                     low_col = self.stock_cols['low']
                     volume_col = self.stock_cols['volume']
@@ -111,7 +110,7 @@ class DataQueryEngine:
                     latest_low = company_data.iloc[-1][low_col] if low_col in company_data.columns else 'N/A'
                     latest_volume = company_data.iloc[-1][volume_col] if volume_col in company_data.columns else 'N/A'
                     
-                    # 计算价格统计
+                    # Calculate price statistics
                     avg_price = company_data[close_col].mean()
                     price_change_pct = ((latest_price - avg_price) / avg_price * 100) if avg_price > 0 else 0
                     
@@ -125,7 +124,7 @@ class DataQueryEngine:
                 else:
                     return f"Sorry, no data found for {company}. Available stocks: {', '.join(self.available_symbols[:10])}"
             
-            # 平均股价 - 更详细的市场概况
+            # Average price - more detailed market overview
             elif 'average' in question or 'mean' in question:
                 avg_price = self.stock_data[close_col].mean()
                 median_price = self.stock_data[close_col].median()
@@ -139,14 +138,14 @@ class DataQueryEngine:
 • Companies Analyzed: {total_companies}
 • Price Range: ${self.stock_data[close_col].min():.2f} - ${self.stock_data[close_col].max():.2f}"""
             
-            # 最高/最低股价 - 包含更多上下文
+            # Highest/lowest price - with more context
             elif 'highest' in question or 'max' in question:
                 max_price = self.stock_data[close_col].max()
                 max_idx = self.stock_data[close_col].idxmax()
                 max_company = self.stock_data.loc[max_idx, 'symbol']
                 max_date = self.stock_data.loc[max_idx, 'date'] if 'date' in self.stock_data.columns else 'N/A'
                 
-                # 找到前5名最高价格
+                # Find top 5 highest prices
                 top_5_prices = self.stock_data.groupby('symbol')[close_col].max().sort_values(ascending=False).head(5)
                 top_5_list = [f"{symbol}: ${price:.2f}" for symbol, price in top_5_prices.items()]
                 
@@ -162,7 +161,7 @@ Top 5 Highest Prices:
                 min_company = self.stock_data.loc[min_idx, 'symbol']
                 min_date = self.stock_data.loc[min_idx, 'date'] if 'date' in self.stock_data.columns else 'N/A'
                 
-                # 找到最低5名价格
+                # Find bottom 5 lowest prices
                 bottom_5_prices = self.stock_data.groupby('symbol')[close_col].min().sort_values().head(5)
                 bottom_5_list = [f"{symbol}: ${price:.2f}" for symbol, price in bottom_5_prices.items()]
                 
@@ -180,7 +179,7 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to retrieve stock price information."
     
     def _handle_earnings_query(self, question):
-        """处理收益查询"""
+        """Handles earnings queries"""
         try:
             if self.earnings_data.empty:
                 return "Sorry, no earnings data currently available."
@@ -195,7 +194,7 @@ Bottom 5 Lowest Prices:
                     available = self.earnings_data['symbol'].unique()[:10]
                     return f"No earnings data found for {company}. Available companies: {', '.join(available)}"
             else:
-                # 显示总体收益摘要
+                # Show overall earnings summary
                 avg_eps = self.earnings_data['reportedEPS'].mean() if 'reportedEPS' in self.earnings_data.columns else 0
                 return f"Earnings data summary:\n• Average EPS: {avg_eps:.2f}\n• Records: {len(self.earnings_data)}\n• Companies covered: {len(self.earnings_data['symbol'].unique())}"
                 
@@ -204,7 +203,7 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to retrieve earnings information."
     
     def _handle_cashflow_query(self, question):
-        """处理现金流查询"""
+        """Handles cash flow queries"""
         try:
             if self.cashflow_data.empty:
                 return "Sorry, no cash flow data currently available."
@@ -226,7 +225,7 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to retrieve cash flow information."
     
     def _handle_sentiment_query(self, question):
-        """处理情绪查询"""
+        """Handles sentiment queries"""
         try:
             if self.news_data.empty:
                 return "Sorry, no news sentiment data currently available."
@@ -244,7 +243,7 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to retrieve sentiment analysis information."
     
     def _handle_stats_query(self, question):
-        """处理统计查询"""
+        """Handles statistical queries"""
         try:
             close_col = self.stock_cols['close']
             
@@ -273,9 +272,9 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to calculate statistics."
     
     def _handle_comparison_query(self, question):
-        """处理比较查询 - 增强版"""
+        """Handles comparison queries - enhanced version"""
         try:
-            # 检查是否要求更多方面的比较
+            # Check if more detailed comparison is requested
             detailed_analysis = any(word in question.lower() for word in 
                                   ['more', 'detailed', 'comprehensive', 'full', 'complete', 'aspect', 'detail'])
             
@@ -288,19 +287,19 @@ Bottom 5 Lowest Prices:
                 
                 results = []
                 
-                for company in companies[:3]:  # 最多比较3家
+                for company in companies[:3]:  # Compare up to 3 companies
                     company_data = self.stock_data[self.stock_data['symbol'] == company.upper()]
                     if not company_data.empty:
                         latest_price = company_data.iloc[-1][close_col]
                         
                         if detailed_analysis:
-                            # 详细比较
+                            # Detailed comparison
                             avg_price = company_data[close_col].mean()
                             latest_high = company_data.iloc[-1][high_col] if high_col in company_data.columns else 'N/A'
                             latest_low = company_data.iloc[-1][low_col] if low_col in company_data.columns else 'N/A'
                             latest_volume = company_data.iloc[-1][volume_col] if volume_col in company_data.columns else 'N/A'
                             
-                            # 获取收益数据（如果有）
+                            # Get earnings data (if available)
                             earnings_info = ""
                             if not self.earnings_data.empty and 'symbol' in self.earnings_data.columns:
                                 company_earnings = self.earnings_data[self.earnings_data['symbol'] == company.upper()]
@@ -308,7 +307,7 @@ Bottom 5 Lowest Prices:
                                     latest_eps = company_earnings.iloc[-1].get('reportedEPS', 'N/A')
                                     earnings_info = f"\n  📊 Latest EPS: {latest_eps}"
                             
-                            # 获取现金流数据（如果有）
+                            # Get cash flow data (if available)
                             cashflow_info = ""
                             if not self.cashflow_data.empty and 'symbol' in self.cashflow_data.columns:
                                 company_cf = self.cashflow_data[self.cashflow_data['symbol'] == company.upper()]
@@ -322,7 +321,7 @@ Bottom 5 Lowest Prices:
   📈 Day High: ${latest_high:.2f} | 📉 Day Low: ${latest_low:.2f}
   📦 Volume: {latest_volume:,} shares{earnings_info}{cashflow_info}""")
                         else:
-                            # 简单比较
+                            # Simple comparison
                             results.append(f"• {company}: ${latest_price:.2f}")
                 
                 if results:
@@ -340,11 +339,11 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to perform comparison analysis."
     
     def _handle_ranking_query(self, question):
-        """处理排名查询"""
+        """Handles ranking queries"""
         try:
             close_col = self.stock_cols['close']
             
-            # 获取每个公司的最新股价
+            # Get the latest stock price for each company
             latest_prices = self.stock_data.groupby('symbol')[close_col].last().sort_values(ascending=False)
             
             if 'top' in question:
@@ -360,7 +359,7 @@ Bottom 5 Lowest Prices:
                 return f"{n} lowest stock prices:\n" + "\n".join(results)
             
             else:
-                # 默认显示前5名
+                # Default to showing top 5
                 top_5 = latest_prices.head(5)
                 results = [f"{i+1}. {symbol}: ${price:.2f}" for i, (symbol, price) in enumerate(top_5.items())]
                 return f"Top 5 companies by stock price:\n" + "\n".join(results)
@@ -370,7 +369,7 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to generate ranking information."
     
     def _handle_info_query(self, question):
-        """处理信息查询"""
+        """Handles information queries"""
         try:
             if 'companies' in question or 'symbols' in question:
                 symbols = sorted(self.available_symbols)
@@ -387,12 +386,12 @@ Bottom 5 Lowest Prices:
             return "Sorry, unable to retrieve data information."
     
     def _handle_fallback_query(self, question):
-        """处理回退查询"""
+        """Handles fallback queries"""
         return f"Sorry, I can't process this query: '{question}'.\n\nI can help you with:\n• Stock prices: 'What is Apple stock price?'\n• Company comparisons: 'Compare Apple and Microsoft'\n• Rankings: 'Top 5 companies by stock price'\n• Data summary: 'Show me data summary'"
     
     def _extract_company(self, question):
-        """从问题中提取公司名"""
-        # 常见公司名映射
+        """Extracts company name from the question"""
+        # Common company name mapping
         company_map = {
             'apple': 'AAPL',
             'microsoft': 'MSFT', 
@@ -411,7 +410,7 @@ Bottom 5 Lowest Prices:
             if name in question.lower():
                 return symbol
         
-        # 检查是否直接提到了股票代码
+        # Check if a stock symbol was directly mentioned
         for symbol in self.available_symbols:
             if symbol.lower() in question.lower():
                 return symbol
@@ -419,10 +418,10 @@ Bottom 5 Lowest Prices:
         return None
     
     def _extract_multiple_companies(self, question):
-        """从问题中提取多个公司"""
+        """Extracts multiple companies from the question"""
         companies = []
         
-        # 尝试提取常见公司
+        # Try to extract common companies
         company_map = {
             'apple': 'AAPL',
             'microsoft': 'MSFT', 
@@ -438,12 +437,12 @@ Bottom 5 Lowest Prices:
         return companies
     
     def _extract_number(self, question):
-        """从问题中提取数字"""
+        """Extracts a number from the question"""
         import re
         numbers = re.findall(r'\d+', question)
         return int(numbers[0]) if numbers else None
 
-# 全局变量
+# Global variables
 stock_data = None
 news_data = None
 earnings_data = None
@@ -451,21 +450,21 @@ cashflow_data = None
 query_engine = None
 
 def load_and_prepare_data():
-    """加载和预处理数据"""
+    """Loads and preprocesses data"""
     global stock_data, news_data, earnings_data, cashflow_data, query_engine
     
     try:
-        # 加载数据
+        # Load data
         stock_data = pd.read_csv("./data/stock_weekly_data.csv")
         news_data = pd.read_csv("./data/news_sentiment.csv")
         earnings_data = pd.read_csv("./data/quarterly_earnings.csv")
         cashflow_data = pd.read_csv("./data/cash_flow.csv")
         
-        # 数据清理
+        # Data cleaning
         if 'symbol' in stock_data.columns:
             stock_data['symbol'] = stock_data['symbol'].str.upper()
         
-        # 🚀 创建直接查询引擎
+        # 🚀 Create direct query engine
         query_engine = DataQueryEngine(stock_data, news_data, earnings_data, cashflow_data)
         
         logger.info("📊 Data loaded successfully:")
@@ -480,14 +479,14 @@ def load_and_prepare_data():
         return False
 
 def run_analytical_query(query):
-    """运行分析查询 - 使用直接查询引擎"""
+    """Runs analytical query - using direct query engine"""
     try:
         logger.info(f"🔍 Processing query: {query}")
         
         if query_engine is None:
             return "Data analysis system not initialized. Please try again later."
         
-        # 🚀 使用直接查询引擎
+        # 🚀 Use direct query engine
         result = query_engine.query(query)
         
         if result:
@@ -501,7 +500,7 @@ def run_analytical_query(query):
         return f"Sorry, an error occurred while processing your query: {str(e)}"
 
 def initialize_system():
-    """初始化系统"""
+    """Initializes the system"""
     logger.info("🚀 Initializing direct query system...")
     
     if not load_and_prepare_data():
@@ -511,10 +510,10 @@ def initialize_system():
     logger.info("✅ System initialization complete")
     return True
 
-# 在模块加载时初始化
+# Initialize when the module is loaded
 if __name__ == "__main__":
     if initialize_system():
-        # 测试查询
+        # Test queries
         test_queries = [
             "What is Apple stock price?",
             "Show me the highest stock price",

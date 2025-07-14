@@ -8,38 +8,38 @@ class AlphaVantageService:
     def __init__(self):
         self.api_key = current_app.config.get('ALPHA_VANTAGE_API_KEY')
         self.base_url = 'https://www.alphavantage.co/query'
-        self._cache = {}  # 简单内存缓存
+        self._cache = {}  # Simple in-memory cache
         
     def _make_request(self, params: Dict) -> Dict:
-        """发送API请求"""
+        """Sends an API request"""
         params['apikey'] = self.api_key
         
-        print(f"请求Alpha Vantage API: {params}")
+        print(f"Requesting Alpha Vantage API: {params}")
         
         try:
             response = requests.get(self.base_url, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
             
-            # 检查API错误
+            # Check for API errors
             if 'Error Message' in data:
-                raise Exception(f"API错误: {data['Error Message']}")
+                raise Exception(f"API Error: {data['Error Message']}")
             elif 'Information' in data:
-                raise Exception(f"API限制: {data['Information']}")
+                raise Exception(f"API Limit: {data['Information']}")
                 
             return data
             
         except requests.exceptions.RequestException as e:
-            print(f"请求失败: {e}")
-            raise Exception(f"网络请求失败: {e}")
+            print(f"Request failed: {e}")
+            raise Exception(f"Network request failed: {e}")
         
     
     
     def _get_cached_data(self, key: str, expires_in: int = 600) -> Optional[Dict]:
-        """获取缓存数据"""
+        """Retrieves cached data"""
         if key in self._cache:
             cached_item = self._cache[key]
-            # 使用传入的过期时间
+            # Use the provided expiration time
             if time.time() - cached_item['timestamp'] < expires_in:
                 return cached_item['data']
             else:
@@ -47,23 +47,23 @@ class AlphaVantageService:
         return None
     
     def _set_cache_data(self, key: str, data: Dict):
-        """设置缓存数据"""
+        """Sets cached data"""
         self._cache[key] = {
             'data': data,
             'timestamp': time.time()
         }
     
     def get_top_gainers_losers_full(self) -> Dict:
-        """获取完整的涨跌幅排行榜数据（带缓存）"""
+        """Retrieves full top gainers and losers data (with caching)"""
         cache_key = "top_gainers_losers_full"
         
-        # 检查缓存
+        # Check cache
         cached_data = self._get_cached_data(cache_key, expires_in=600)
         if cached_data:
-            print("使用缓存的排行榜数据")
+            print("Using cached top gainers/losers data")
             return cached_data
         
-        # 调用API获取新数据
+        # Call API for new data
         params = {
             'function': 'TOP_GAINERS_LOSERS'
         }
@@ -72,10 +72,10 @@ class AlphaVantageService:
             data = self._make_request(params)
             
             if 'top_gainers' not in data:
-                print(f"API返回数据格式异常: {list(data.keys())}")
-                raise Exception("API返回数据格式不正确")
+                print(f"API returned data in unexpected format: {list(data.keys())}")
+                raise Exception("API returned data in incorrect format")
             
-            # 处理和标准化数据
+            # Process and standardize data
             processed_data = {
                 'last_updated': data.get('last_updated', ''),
                 'top_gainers': self._process_stock_list(data.get('top_gainers', [])),
@@ -83,24 +83,24 @@ class AlphaVantageService:
                 'most_actively_traded': self._process_stock_list(data.get('most_actively_traded', []))
             }
             
-            # 缓存数据
+            # Cache data
             self._set_cache_data(cache_key, processed_data)
             
-            print(f"成功获取排行榜数据: 涨幅榜{len(processed_data['top_gainers'])}只, 跌幅榜{len(processed_data['top_losers'])}只, 成交量榜{len(processed_data['most_actively_traded'])}只")
+            print(f"Successfully fetched top gainers/losers data: {len(processed_data['top_gainers'])} gainers, {len(processed_data['top_losers'])} losers, {len(processed_data['most_actively_traded'])} actively traded")
             
             return processed_data
             
         except Exception as e:
-            print(f"获取排行榜数据失败: {e}")
+            print(f"Failed to fetch top gainers/losers data: {e}")
             raise e
     
     def _process_stock_list(self, stock_list: List[Dict]) -> List[Dict]:
-        """处理股票列表数据，标准化格式"""
+        """Processes stock list data, standardizing the format"""
         processed_stocks = []
         
         for stock in stock_list:
             try:
-                # Alpha Vantage API返回的字段名可能不同，需要适配
+                # Alpha Vantage API returns different field names, needs adaptation
                 processed_stock = {
                     'ticker': stock.get('ticker', ''),
                     'price': self._safe_float(stock.get('price', '0')),
@@ -109,28 +109,28 @@ class AlphaVantageService:
                     'volume': self._safe_int(stock.get('volume', '0'))
                 }
                 
-                # 确保数据完整
+                # Ensure data is complete
                 if processed_stock['ticker']:
                     processed_stocks.append(processed_stock)
                     
             except Exception as e:
-                print(f"处理股票数据失败: {stock}, 错误: {e}")
+                print(f"Failed to process stock data: {stock}, Error: {e}")
                 continue
         
         return processed_stocks
     
     def _safe_float(self, value) -> float:
-        """安全转换为浮点数"""
+        """Safely converts to float"""
         try:
             if isinstance(value, str):
-                # 移除可能的货币符号和逗号
+                # Remove potential currency symbols and commas
                 value = value.replace('$', '').replace(',', '')
             return float(value)
         except (ValueError, TypeError):
             return 0.0
     
     def _safe_int(self, value) -> int:
-        """安全转换为整数"""
+        """Safely converts to integer"""
         try:
             if isinstance(value, str):
                 value = value.replace(',', '')
@@ -139,24 +139,24 @@ class AlphaVantageService:
             return 0
     
     def get_paginated_stocks(self, category: str, page: int = 1, limit: int = 20) -> Dict:
-        """获取分页的股票数据"""
+        """Retrieves paginated stock data"""
         try:
-            # 获取完整数据
+            # Get full data
             full_data = self.get_top_gainers_losers_full()
             
-            # 根据分类获取对应的股票列表
+            # Get the corresponding stock list based on category
             if category not in full_data:
-                raise Exception(f"不支持的分类: {category}")
+                raise Exception(f"Unsupported category: {category}")
             
             stock_list = full_data[category]
             total_stocks = len(stock_list)
             
-            # 计算分页
+            # Calculate pagination
             start_idx = (page - 1) * limit
             end_idx = min(start_idx + limit, total_stocks)
             paginated_stocks = stock_list[start_idx:end_idx]
             
-            # 构建分页信息
+            # Build pagination information
             pagination_info = {
                 'current_page': page,
                 'total_items': total_stocks,
@@ -176,14 +176,14 @@ class AlphaVantageService:
             }
             
         except Exception as e:
-            print(f"获取分页股票数据失败: {e}")
+            print(f"Failed to retrieve paginated stock data: {e}")
             raise e
     
     def get_quote(self, symbol: str) -> Dict:
-        """获取股票实时报价"""
+        """Retrieves real-time stock quote"""
         cache_key = f"quote_{symbol.upper()}"
         
-        # 检查缓存
+        # Check cache
         cached_data = self._get_cached_data(cache_key, expires_in=600)
         if cached_data:
             return cached_data
@@ -200,7 +200,7 @@ class AlphaVantageService:
         
         quote_data = data['Global Quote']
         
-        # 格式化返回数据
+        # Format returned data
         result = {
             'symbol': quote_data.get('01. symbol', symbol.upper()),
             'price': self._safe_float(quote_data.get('05. price', 0)),
@@ -214,12 +214,12 @@ class AlphaVantageService:
             'low': self._safe_float(quote_data.get('04. low', 0))
         }
         
-        # 缓存结果
+        # Cache the result
         self._set_cache_data(cache_key, result)
         return result
     
     def search_stocks(self, query: str) -> List[Dict]:
-        """搜索股票"""
+        """Searches for stocks"""
         params = {
             'function': 'SYMBOL_SEARCH',
             'keywords': query
@@ -232,7 +232,7 @@ class AlphaVantageService:
                 return []
             
             results = []
-            for match in data['bestMatches'][:10]:  # 限制10个结果
+            for match in data['bestMatches'][:10]:  # Limit to 10 results
                 results.append({
                     'symbol': match.get('1. symbol', ''),
                     'name': match.get('2. name', ''),
@@ -244,14 +244,14 @@ class AlphaVantageService:
             return results
             
         except Exception as e:
-            print(f"搜索失败: {e}")
+            print(f"Search failed: {e}")
             return []
         
     def get_company_overview(self, symbol: str) -> Dict:
-        """获取公司概况"""
+        """Retrieves company overview"""
         cache_key = f"overview_{symbol.upper()}"
         
-        # 检查缓存
+        # Check cache
         cached_data = self._get_cached_data(cache_key, expires_in=86400)
         if cached_data:
             return cached_data
@@ -265,10 +265,10 @@ class AlphaVantageService:
             data = self._make_request(params)
             
             if not data or 'Symbol' not in data:
-                print(f"公司概况数据为空: {symbol}")
+                print(f"Company overview data is empty: {symbol}")
                 return {}
             
-            # 缓存结果（1小时）
+            # Cache the result (1 hour)
             self._cache[cache_key] = {
                 'data': data,
                 'timestamp': time.time()
@@ -277,40 +277,40 @@ class AlphaVantageService:
             return data
             
         except Exception as e:
-            print(f"获取公司概况失败: {e}")
+            print(f"Failed to get company overview: {e}")
             return {}   
         
     def get_stock_news(self, symbol: str) -> Dict:
-        """获取股票新闻"""
+        """Retrieves stock news"""
         cache_key = f"news_{symbol.upper()}"
         
-        # 检查缓存 - 新闻缓存30分钟
+        # Check cache - news cache 30 minutes
         cached_data = self._get_cached_data(cache_key, expires_in=1800)
         if cached_data:
-            print(f"使用缓存的新闻数据: {symbol}")
+            print(f"Using cached news data: {symbol}")
             return cached_data
         
         params = {
             'function': 'NEWS_SENTIMENT',
             'tickers': symbol.upper(),
-            'limit': 20  # 获取20条新闻
+            'limit': 20  # Get 20 news articles
         }
         
         try:
             data = self._make_request(params)
             
             if 'feed' not in data:
-                print(f"新闻数据为空: {symbol}")
+                print(f"News data is empty: {symbol}")
                 return {}
             
-            # 处理新闻数据
+            # Process news data
             processed_news = {
                 'feed': [],
                 'items': data.get('items', '0'),
                 'sentiment_score_definition': data.get('sentiment_score_definition', '')
             }
             
-            # 处理每条新闻
+            # Process each article
             for article in data.get('feed', []):
                 processed_article = {
                     'title': article.get('title', ''),
@@ -325,14 +325,12 @@ class AlphaVantageService:
                 }
                 processed_news['feed'].append(processed_article)
             
-            # 缓存结果
+            # Cache the result
             self._set_cache_data(cache_key, processed_news)
-            print(f"成功获取并缓存新闻: {symbol}, 共{len(processed_news['feed'])}条")
+            print(f"Successfully fetched and cached news: {symbol}, {len(processed_news['feed'])} articles")
             
             return processed_news
             
         except Exception as e:
-            print(f"获取股票新闻失败: {e}")
+            print(f"Failed to get stock news: {e}")
             raise e
-            
-            

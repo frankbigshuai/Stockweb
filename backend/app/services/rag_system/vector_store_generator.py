@@ -1,40 +1,40 @@
-from langchain_community.document_loaders import CSVLoader  # CSV加载器
-from langchain_openai import OpenAIEmbeddings  # 嵌入模型
-from langchain_community.vectorstores import FAISS  # 向量数据库
-from config_utils import load_openai_key  # 密钥加载
+from langchain_community.document_loaders import CSVLoader
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from config_utils import load_openai_key
 import os
 
 def generate_vector_store():
-    """生成向量存储"""
+    """Generates the vector store"""
     try:
-        # 检查数据文件是否存在
+        # Check if the data file exists
         csv_file = "./data/company_overview.csv"
         if not os.path.exists(csv_file):
             raise FileNotFoundError(f"Data file not found: {csv_file}")
         
         print(f"📊 Loading data from: {csv_file}")
         
-        # 从CSV加载公司数据
+        # Load company data from CSV
         loader = CSVLoader(file_path=csv_file)
         documents = loader.load()
         
         print(f"✅ Loaded {len(documents)} documents")
         
-        # 初始化嵌入模型
+        # Initialize the embedding model
         embeddings_model = OpenAIEmbeddings(openai_api_key=load_openai_key())
         
         print("🔄 Creating vector store...")
         
-        # 创建并保存向量库
+        # Create and save the vector library
         vectorstore = FAISS.from_documents(documents, embeddings_model)
-        vectorstore_bytes = vectorstore.serialize_to_bytes()  # 序列化为字节
+        vectorstore_bytes = vectorstore.serialize_to_bytes()
         
-        # 确保tmp目录存在
+        # Ensure the tmp directory exists
         os.makedirs('./tmp', exist_ok=True)
         
-        # 保存到文件
+        # Save to file
         with open('./tmp/faiss_vectorstore.pkl', 'wb') as f:
-            f.write(vectorstore_bytes)  # 保存到文件
+            f.write(vectorstore_bytes)
         
         print("✅ Vector store saved successfully to ./tmp/faiss_vectorstore.pkl")
         
