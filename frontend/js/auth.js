@@ -1,5 +1,230 @@
 // Complete auth.js - Fixed all logical issues + RAG integration
 console.log('Auth.js loaded');
+// 主题切换功能 - 添加到你的auth.js或主JavaScript文件中
+
+// 主题管理器
+class ThemeManager {
+    constructor() {
+        this.themes = {
+            LIGHT: 'light',
+            DARK: 'dark'
+        };
+        this.currentTheme = this.getStoredTheme() || this.getSystemTheme();
+        this.init();
+    }
+
+    init() {
+        // 应用保存的主题
+        this.applyTheme(this.currentTheme);
+        
+        // 监听系统主题变化
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!this.getStoredTheme()) {
+                    this.applyTheme(e.matches ? this.themes.DARK : this.themes.LIGHT);
+                }
+            });
+        }
+        
+        // 更新切换按钮
+        this.updateToggleButton();
+        
+        console.log(`🎨 Theme initialized: ${this.currentTheme}`);
+    }
+
+    getSystemTheme() {
+        // 检测系统偏好
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return this.themes.DARK;
+        }
+        return this.themes.LIGHT;
+    }
+
+    getStoredTheme() {
+        // 从localStorage获取保存的主题
+        return localStorage.getItem('stockweb-theme');
+    }
+
+    saveTheme(theme) {
+        // 保存主题到localStorage
+        localStorage.setItem('stockweb-theme', theme);
+        console.log(`💾 Theme saved: ${theme}`);
+    }
+
+    applyTheme(theme) {
+        // 应用主题到document
+        const html = document.documentElement;
+        
+        if (theme === this.themes.DARK) {
+            html.setAttribute('data-theme', 'dark');
+        } else {
+            html.removeAttribute('data-theme');
+        }
+        
+        this.currentTheme = theme;
+        this.updateToggleButton();
+        
+        // 触发主题变化事件
+        window.dispatchEvent(new CustomEvent('themeChanged', { 
+            detail: { theme: this.currentTheme } 
+        }));
+    }
+
+    toggleTheme() {
+        // 切换主题
+        const newTheme = this.currentTheme === this.themes.LIGHT 
+            ? this.themes.DARK 
+            : this.themes.LIGHT;
+        
+        this.applyTheme(newTheme);
+        this.saveTheme(newTheme);
+        
+        console.log(`🔄 Theme toggled to: ${newTheme}`);
+        
+        // 添加切换动画
+        this.addToggleAnimation();
+    }
+
+    updateToggleButton() {
+        // 更新切换按钮的图标和文本
+        const themeIcon = document.getElementById('themeIcon');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        if (themeIcon && themeToggle) {
+            if (this.currentTheme === this.themes.DARK) {
+                // 深色模式 - 显示太阳图标
+                themeIcon.textContent = '☀️';
+                themeToggle.setAttribute('title', '切换到浅色模式');
+                
+                // 如果使用SVG图标
+                const moonIcon = document.getElementById('moonIcon');
+                const sunIcon = document.getElementById('sunIcon');
+                if (moonIcon && sunIcon) {
+                    moonIcon.style.display = 'none';
+                    sunIcon.style.display = 'block';
+                }
+            } else {
+                // 浅色模式 - 显示月亮图标
+                themeIcon.textContent = '🌙';
+                themeToggle.setAttribute('title', '切换到深色模式');
+                
+                // 如果使用SVG图标
+                const moonIcon = document.getElementById('moonIcon');
+                const sunIcon = document.getElementById('sunIcon');
+                if (moonIcon && sunIcon) {
+                    moonIcon.style.display = 'block';
+                    sunIcon.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    addToggleAnimation() {
+        // 添加切换动画效果
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                themeToggle.style.transform = '';
+            }, 300);
+        }
+        
+        // 页面过渡动画
+        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 300);
+    }
+
+    getCurrentTheme() {
+        return this.currentTheme;
+    }
+
+    isDarkMode() {
+        return this.currentTheme === this.themes.DARK;
+    }
+
+    setTheme(theme) {
+        if (Object.values(this.themes).includes(theme)) {
+            this.applyTheme(theme);
+            this.saveTheme(theme);
+        }
+    }
+}
+
+// 创建全局主题管理器实例
+const themeManager = new ThemeManager();
+
+// 全局切换函数（用于按钮onclick）
+function toggleTheme() {
+    themeManager.toggleTheme();
+}
+
+// 获取当前主题的辅助函数
+function getCurrentTheme() {
+    return themeManager.getCurrentTheme();
+}
+
+function isDarkMode() {
+    return themeManager.isDarkMode();
+}
+
+// 主题变化监听器示例
+window.addEventListener('themeChanged', (event) => {
+    const theme = event.detail.theme;
+    console.log(`🎨 Theme changed to: ${theme}`);
+    
+    // 在这里可以添加主题变化时的特殊处理
+    // 例如：更新图表颜色、重新加载某些组件等
+    
+    // 例如：如果有图表，可以更新图表主题
+    // updateChartTheme(theme);
+});
+
+// 页面加载完成后的额外初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 确保主题管理器已初始化
+    if (typeof themeManager !== 'undefined') {
+        console.log('✅ Theme manager loaded successfully');
+        
+        // 可以添加额外的主题相关初始化
+        // 例如：根据主题调整特定元素
+        applyThemeSpecificStyles();
+    }
+});
+
+// 应用主题特定样式的辅助函数
+function applyThemeSpecificStyles() {
+    const isDark = themeManager.isDarkMode();
+    
+    // 例如：调整图表或其他元素的主题
+    const charts = document.querySelectorAll('.chart');
+    charts.forEach(chart => {
+        if (isDark) {
+            chart.classList.add('dark-theme');
+        } else {
+            chart.classList.remove('dark-theme');
+        }
+    });
+    
+    // 例如：调整特定图标的显示
+    const icons = document.querySelectorAll('.theme-sensitive-icon');
+    icons.forEach(icon => {
+        if (isDark) {
+            icon.style.filter = 'invert(1)';
+        } else {
+            icon.style.filter = '';
+        }
+    });
+}
+
+// 导出给其他文件使用（如果需要）
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { themeManager, toggleTheme, getCurrentTheme, isDarkMode };
+}
+
+// 为调试提供全局访问
+window.themeManager = themeManager;
 
 class AuthManager {
     constructor() {
