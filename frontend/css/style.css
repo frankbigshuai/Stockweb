@@ -32,36 +32,36 @@
     --chatbox-user-bubble: #3498db;
 }
 
-/* 深色模式 */
+/* 深色模式 - Claude风格配色 */
 [data-theme="dark"] {
-    --bg-primary: #121212;
-    --bg-secondary: #1e1e1e;
-    --text-primary: #ffffff;
-    --text-secondary: #b3b3b3;
-    --text-heading: #ffffff;
-    --border-color: #404040;
-    --shadow-light: rgba(0, 0, 0, 0.3);
-    --shadow-medium: rgba(0, 0, 0, 0.4);
-    --shadow-heavy: rgba(0, 0, 0, 0.5);
-    --accent-blue: #4dabf7;
-    --accent-blue-hover: #339af0;
-    --accent-green: #51cf66;
-    --accent-green-hover: #40c057;
-    --success-bg: #1b4d3e;
-    --success-text: #51cf66;
-    --success-border: #2d5a4d;
-    --error-bg: #4d1b1b;
-    --error-text: #ff6b6b;
-    --error-border: #5d2d2d;
-    --info-bg: #1b3d4d;
-    --info-text: #4dabf7;
-    --info-border: #2d4d5d;
-    --input-bg: #2d2d2d;
-    --input-border: #404040;
-    --input-focus: #4dabf7;
-    --chatbox-messages-bg: #2d2d2d;
-    --chatbox-bot-bubble: #404040;
-    --chatbox-user-bubble: #4dabf7;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --text-primary: #e8e8e8;
+    --text-secondary: #a8a8a8;
+    --text-heading: #f0f0f0;
+    --border-color: #3a3a3a;
+    --shadow-light: rgba(0, 0, 0, 0.25);
+    --shadow-medium: rgba(0, 0, 0, 0.35);
+    --shadow-heavy: rgba(0, 0, 0, 0.45);
+    --accent-blue: #5a9fd4;
+    --accent-blue-hover: #4a8fc4;
+    --accent-green: #6bb26a;
+    --accent-green-hover: #5ba25a;
+    --success-bg: #1e3a2e;
+    --success-text: #6bb26a;
+    --success-border: #2e4a3e;
+    --error-bg: #3a1e1e;
+    --error-text: #e07a7a;
+    --error-border: #4a2e2e;
+    --info-bg: #1e2e3a;
+    --info-text: #5a9fd4;
+    --info-border: #2e3e4a;
+    --input-bg: #323232;
+    --input-border: #424242;
+    --input-focus: #5a9fd4;
+    --chatbox-messages-bg: #242424;
+    --chatbox-bot-bubble: #343434;
+    --chatbox-user-bubble: #5a9fd4;
 }
 
 /* 主题切换按钮样式 */
