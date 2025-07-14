@@ -1,7 +1,7 @@
 from bson import ObjectId
 from datetime import datetime
 from typing import Optional, List, Dict
-from ..core.database import mongo
+from ..core.database import get_db
 
 class Post:
     """论坛帖子模型"""
@@ -10,6 +10,11 @@ class Post:
     def get_user_posts(user_id: str, page: int = 1, limit: int = 10) -> Dict:
         """获取用户的帖子列表"""
         try:
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return {"posts": [], "pagination": {}}
+            
             skip = (page - 1) * limit
             
             # 构建查询条件 - 只查询当前用户的帖子
@@ -19,12 +24,12 @@ class Post:
             }
             
             # 按创建时间倒序排列
-            posts_cursor = mongo.db.posts.find(query).sort("created_at", -1).skip(skip).limit(limit)
+            posts_cursor = db.posts.find(query).sort("created_at", -1).skip(skip).limit(limit)
             posts = []
             
             for post in posts_cursor:
                 # 获取作者信息（就是当前用户）
-                author = mongo.db.users.find_one({"_id": post["author_id"]})
+                author = db.users.find_one({"_id": post["author_id"]})
                 
                 post_data = {
                     "id": str(post["_id"]),
@@ -46,7 +51,7 @@ class Post:
                 posts.append(post_data)
             
             # 获取总数用于分页
-            total = mongo.db.posts.count_documents(query)
+            total = db.posts.count_documents(query)
             
             return {
                 "posts": posts,
@@ -68,6 +73,11 @@ class Post:
                 tags: List[str] = None) -> Optional[str]:
             """创建新帖子"""
             try:
+                db = get_db()
+                if db is None:
+                    print("数据库未连接")
+                    return None
+                
                 post_data = {
                     "title": title,
                     "content": content,
@@ -83,7 +93,7 @@ class Post:
                     "is_deleted": False
                 }
                 
-                result = mongo.db.posts.insert_one(post_data)
+                result = db.posts.insert_one(post_data)
                 return str(result.inserted_id)
                 
             except Exception as e:
@@ -95,6 +105,11 @@ class Post:
                   sort_by: str = "latest") -> Dict:
         """获取帖子列表"""
         try:
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return {"posts": [], "pagination": {}}
+            
             skip = (page - 1) * limit
             
             # 构建查询条件
@@ -111,12 +126,12 @@ class Post:
             sort_criteria = sort_options.get(sort_by, [("created_at", -1)])
             
             # 执行查询
-            posts_cursor = mongo.db.posts.find(query).sort(sort_criteria).skip(skip).limit(limit)
+            posts_cursor = db.posts.find(query).sort(sort_criteria).skip(skip).limit(limit)
             posts = []
             
             for post in posts_cursor:
                 # 获取作者信息
-                author = mongo.db.users.find_one({"_id": post["author_id"]})
+                author = db.users.find_one({"_id": post["author_id"]})
                 
                 post_data = {
                     "id": str(post["_id"]),
@@ -137,7 +152,7 @@ class Post:
                 posts.append(post_data)
             
             # 获取总数用于分页
-            total = mongo.db.posts.count_documents(query)
+            total = db.posts.count_documents(query)
             
             return {
                 "posts": posts,
@@ -158,18 +173,23 @@ class Post:
     def get_post_detail(post_id: str) -> Optional[Dict]:
         """获取帖子详情"""
         try:
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return None
+            
             # 增加浏览量
-            mongo.db.posts.update_one(
+            db.posts.update_one(
                 {"_id": ObjectId(post_id)},
                 {"$inc": {"views": 1}}
             )
             
-            post = mongo.db.posts.find_one({"_id": ObjectId(post_id), "is_deleted": False})
+            post = db.posts.find_one({"_id": ObjectId(post_id), "is_deleted": False})
             if not post:
                 return None
             
             # 获取作者信息
-            author = mongo.db.users.find_one({"_id": post["author_id"]})
+            author = db.users.find_one({"_id": post["author_id"]})
             
             return {
                 "id": str(post["_id"]),
@@ -197,8 +217,13 @@ class Post:
     def update_post(post_id: str, author_id: str, **kwargs) -> bool:
         """更新帖子"""
         try:
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return False
+            
             # 验证权限
-            post = mongo.db.posts.find_one({"_id": ObjectId(post_id), "author_id": ObjectId(author_id)})
+            post = db.posts.find_one({"_id": ObjectId(post_id), "author_id": ObjectId(author_id)})
             if not post:
                 return False
             
@@ -215,7 +240,7 @@ class Post:
             if update_data:
                 update_data["updated_at"] = datetime.utcnow()
                 
-                result = mongo.db.posts.update_one(
+                result = db.posts.update_one(
                     {"_id": ObjectId(post_id)},
                     {"$set": update_data}
                 )
@@ -231,7 +256,12 @@ class Post:
     def delete_post(post_id: str, author_id: str) -> bool:
         """删除帖子（软删除）"""
         try:
-            result = mongo.db.posts.update_one(
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return False
+            
+            result = db.posts.update_one(
                 {"_id": ObjectId(post_id), "author_id": ObjectId(author_id)},
                 {"$set": {"is_deleted": True, "updated_at": datetime.utcnow()}}
             )
@@ -245,28 +275,32 @@ class Post:
     def toggle_like(post_id: str, user_id: str) -> Dict:
         """切换帖子点赞状态"""
         try:
+            db = get_db()
+            if db is None:
+                return {"error": "数据库未连接"}
+            
             # 检查用户是否已经点赞
-            like_record = mongo.db.post_likes.find_one({
+            like_record = db.post_likes.find_one({
                 "post_id": ObjectId(post_id),
                 "user_id": ObjectId(user_id)
             })
             
             if like_record:
                 # 取消点赞
-                mongo.db.post_likes.delete_one({"_id": like_record["_id"]})
-                mongo.db.posts.update_one(
+                db.post_likes.delete_one({"_id": like_record["_id"]})
+                db.posts.update_one(
                     {"_id": ObjectId(post_id)},
                     {"$inc": {"likes": -1}}
                 )
                 return {"liked": False, "message": "取消点赞"}
             else:
                 # 添加点赞
-                mongo.db.post_likes.insert_one({
+                db.post_likes.insert_one({
                     "post_id": ObjectId(post_id),
                     "user_id": ObjectId(user_id),
                     "created_at": datetime.utcnow()
                 })
-                mongo.db.posts.update_one(
+                db.posts.update_one(
                     {"_id": ObjectId(post_id)},
                     {"$inc": {"likes": 1}}
                 )
@@ -284,6 +318,11 @@ class Comment:
     def create(post_id: str, author_id: str, content: str, parent_id: str = None) -> Optional[str]:
         """创建评论"""
         try:
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return None
+            
             comment_data = {
                 "post_id": ObjectId(post_id),
                 "author_id": ObjectId(author_id),
@@ -294,10 +333,10 @@ class Comment:
                 "is_deleted": False
             }
             
-            result = mongo.db.comments.insert_one(comment_data)
+            result = db.comments.insert_one(comment_data)
             
             # 更新帖子评论数
-            mongo.db.posts.update_one(
+            db.posts.update_one(
                 {"_id": ObjectId(post_id)},
                 {"$inc": {"comment_count": 1}}
             )
@@ -312,7 +351,12 @@ class Comment:
     def get_comments(post_id: str) -> List[Dict]:
         """获取帖子的所有评论"""
         try:
-            comments = mongo.db.comments.find({
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return []
+            
+            comments = db.comments.find({
                 "post_id": ObjectId(post_id),
                 "is_deleted": False
             }).sort("created_at", 1)
@@ -320,7 +364,7 @@ class Comment:
             result = []
             for comment in comments:
                 # 获取作者信息
-                author = mongo.db.users.find_one({"_id": comment["author_id"]})
+                author = db.users.find_one({"_id": comment["author_id"]})
                 
                 comment_data = {
                     "id": str(comment["_id"]),
@@ -345,7 +389,12 @@ class Comment:
     def delete_comment(comment_id: str, author_id: str) -> bool:
         """删除评论"""
         try:
-            comment = mongo.db.comments.find_one({
+            db = get_db()
+            if db is None:
+                print("数据库未连接")
+                return False
+            
+            comment = db.comments.find_one({
                 "_id": ObjectId(comment_id),
                 "author_id": ObjectId(author_id)
             })
@@ -354,14 +403,14 @@ class Comment:
                 return False
             
             # 软删除评论
-            result = mongo.db.comments.update_one(
+            result = db.comments.update_one(
                 {"_id": ObjectId(comment_id)},
                 {"$set": {"is_deleted": True}}
             )
             
             # 减少帖子评论数
             if result.modified_count > 0:
-                mongo.db.posts.update_one(
+                db.posts.update_one(
                     {"_id": comment["post_id"]},
                     {"$inc": {"comment_count": -1}}
                 )

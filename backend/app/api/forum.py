@@ -306,13 +306,20 @@ def get_my_posts():
 def debug_database():
     """查看数据库状态（仅用于开发）"""
     try:
-        from ..core.database import mongo  # ✅ 改为相对导入
+        from ..core.database import get_db
+        
+        db = get_db()
+        if db is None:
+            return jsonify({
+                "success": False,
+                "error": "数据库未连接"
+            }), 500
         
         stats = {
-            "users_count": mongo.db.users.count_documents({}),
-            "posts_count": mongo.db.posts.count_documents({}),
-            "comments_count": mongo.db.comments.count_documents({}),
-            "post_likes_count": mongo.db.post_likes.count_documents({})
+            "users_count": db.users.count_documents({}),
+            "posts_count": db.posts.count_documents({}),
+            "comments_count": db.comments.count_documents({}),
+            "post_likes_count": db.post_likes.count_documents({})
         }
         
         return jsonify({
